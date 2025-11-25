@@ -1,0 +1,28 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Large data files
+*.npy
+*.pth
+*.h5
+*.pkl
+
+# Jupyter notebooks (not needed for training)
+*.ipynb
+.ipynb_checkpoints/
+
+./animal.ipynb
+animal.ipynb
+
+# IDE and OS files
+.git/
+.DS_Store
+__pycache__/
+*.pyc
+
+# Other
+.gitignore
+README.md
+
