@@ -16,14 +16,16 @@ import pandas as pd
 import numpy as np
 from PIL import Image
 from io import BytesIO
+from botocore.exceptions import ClientError
+
 import pickle
 import gc  # For garbage collection to free memory
 from tqdm import tqdm  # For progress bars
 import os, psutil
 
-S3_BUCKET = "animal-classification-dss-works"
-TRAIN_PREFIX = "data/train_features/"
-TEST_PREFIX = "data/test_features/"
+bucket_name = "animal-classification-dss-works"
+train_folder = "data/train_features/"
+test_folder = "data/test_features/"
 REGION = "us-west-1"
 
 # Initialize S3 client
@@ -121,7 +123,38 @@ def process_images(bucket, image_keys, is_test):
         
             
     
+def folder_exists_and_not_empty(bucket:str, path:str) -> bool:
+    '''
+    Folder should exists. 
+    Folder should not be empty.
+    '''
+    s3 = boto3.client('s3')
+    if not path.endswith('/'):
+        path = path+'/' 
+    resp = s3.list_objects(Bucket=bucket, Prefix=path, Delimiter='/',MaxKeys=1)
+    return 'Contents' in resp
 
+
+def s3_file_exists(bucket_name, object_name):
+    """
+    Checks if a file exists in an S3 bucket.
+
+    :param bucket_name: Name of the S3 bucket.
+    :param object_name: S3 object key (file path).
+    :return: True if the object exists, False otherwise.
+    """
+    s3_client = boto3.client('s3')
+    try:
+        s3_client.head_object(Bucket=bucket_name, Key=object_name)
+        return True # Object exists
+    except ClientError as e:
+        if e.response['Error']['Code'] == '404':
+            # The object does not exist
+            return False
+        else:
+            # Another error occurred (e.g., permission issues, network problems)
+            print(f"An error occurred: {e}")
+            raise
 
 
 def main():
@@ -132,19 +165,41 @@ def main():
 
     print(f"Initial RAM usage: {get_ram_usage():.2f} MB")
     
-    print("=" * 60)
-    print("IMAGE PREPROCESSING FOR SAGEMAKER TRAINING")
-    print("=" * 60)
+    # print("=" * 60)
+    # print("IMAGE PREPROCESSING FOR SAGEMAKER TRAINING")
+    # print("=" * 60)
 
 
-    print("\n1. Processing TRAINING images...")
-    train_keys = get_all_image_keys(S3_BUCKET, TRAIN_PREFIX) # "data/train_features/"
-    test_keys = get_all_image_keys(S3_BUCKET, TEST_PREFIX) # "data/test_features/"
+    # print("\n1. Processing TRAINING images...")
+    
+    
+    train_exists = folder_exists_and_not_empty(bucket_name, train_folder)
+    test_exists = folder_exists_and_not_empty(bucket_name, test_folder)
+    
+    if train_exists and test_exists:
+        print("Train and test folders exist and are not empty")
+    else:
+        print("Train and test folders do not exist or are empty")
+        train_keys = get_all_image_keys(bucket_name, train_folder) # "data/train_features/"
+        test_keys = get_all_image_keys(bucket_name, test_folder) # "data/test_features/"
+        
+        process_images(bucket_name, train_keys, is_test=False)
+        process_images(bucket_name, test_keys, is_test=True)
+        
+
+
+    
+    # s3_file_exists(bucket_name, "processed/train_features/ZJ000000.jpg")
+    
+    
+    
     
 
 
-    process_images(S3_BUCKET, train_keys, is_test=False)
-    process_images(S3_BUCKET, test_keys, is_test=True)
+    # process_images(bucket_name, train_keys, is_test=False)
+    # process_images(bucket_name, test_keys, is_test=True)
+    
+    
     
     
      
@@ -202,7 +257,7 @@ if __name__ == "__main__":
     #     total_batches = (len(train_keys) - 1) // BATCH_SIZE + 1
         
     #     print(f"\n   Batch {batch_num}/{total_batches} ({len(batch_keys)} images)...")
-    #     batch_df = process_images(S3_BUCKET, batch_keys)
+    #     batch_df = process_images(bucket_name, batch_keys)
         
         
         
@@ -246,7 +301,7 @@ if __name__ == "__main__":
     # print("\n2. Loading training labels...")
     # print(f"After loading training labels RAM usage: {get_ram_usage():.2f} MB")
     # try:
-    #     labels_obj = s3_client.get_object(Bucket=S3_BUCKET, Key="data/train_labels.csv")
+    #     labels_obj = s3_client.get_object(Bucket=bucket_name, Key="data/train_labels.csv")
     #     print("labels_obj loaded successfully")
     #     labels_df = pd.read_csv(labels_obj["Body"])
     #     print(f"Labels loaded: {len(labels_df)} rows")
@@ -286,7 +341,7 @@ if __name__ == "__main__":
     # print(f"After merging training labels RAM usage: {get_ram_usage():.2f} MB")
     # # Process test images IN BATCHES (save to disk immediately)
     # print("\n3. Processing TEST images...")
-    # test_keys = get_all_image_keys(S3_BUCKET, TEST_PREFIX)
+    # test_keys = get_all_image_keys(bucket_name, test_folderEFIX)
     # print(f"After getting test image keys RAM usage: {get_ram_usage():.2f} MB")
     
     # # Create temp directory for test batch files
@@ -303,7 +358,7 @@ if __name__ == "__main__":
     #     total_batches = (len(test_keys) - 1) // BATCH_SIZE + 1
         
     #     print(f"\n   Batch {batch_num}/{total_batches} ({len(batch_keys)} images)...")
-    #     batch_df = process_images(S3_BUCKET, batch_keys)
+    #     batch_df = process_images(bucket_name, batch_keys)
         
     #     # Save batch to disk immediately
     #     batch_file = os.path.join(temp_dir_test, f'test_batch_{batch_num}.pkl')
@@ -360,13 +415,13 @@ if __name__ == "__main__":
     # print(f"\n4. Saving preprocessed data to {OUTPUT_DIR}...")
     
     # # Save pickle files WITH image data (for training)
-    # train_pkl = os.path.join(OUTPUT_DIR, 'train_data.pkl')
+    # train_folderkl = os.path.join(OUTPUT_DIR, 'train_data.pkl')
     # test_pkl = os.path.join(OUTPUT_DIR, 'test_data.pkl')
     # print(f"After saving pickle files RAM usage: {get_ram_usage():.2f} MB")
     # print(f"Saving pickle files (with image data)...")
-    # with open(train_pkl, 'wb') as f:
+    # with open(train_folderkl, 'wb') as f:
     #     pickle.dump(train_df, f)
-    # print(f"✓ Saved {train_pkl} ({os.path.getsize(train_pkl) / 1024 / 1024:.1f} MB)")
+    # print(f"✓ Saved {train_folderkl} ({os.path.getsize(train_folderkl) / 1024 / 1024:.1f} MB)")
 
     # with open(test_pkl, 'wb') as f:
     #     pickle.dump(test_df, f)

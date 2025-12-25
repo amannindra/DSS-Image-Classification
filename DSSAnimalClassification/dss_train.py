@@ -11,6 +11,7 @@ import sys
 # import pickle
 from io import BytesIO
 import boto3
+import gc
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -41,6 +42,7 @@ from torchvision.models import resnet18, ResNet18_Weights
 
 import torchvision.models as models
 import os
+import psutil
 
 # import cv2
 
@@ -53,6 +55,13 @@ import os
 
 from PIL import Image
 from tqdm import tqdm
+
+
+def get_ram_usage():
+    # Get the process info for the current Python script
+    process = psutil.Process(os.getpid())
+    # Return the Resident Set Size (RSS) in megabytes
+    return process.memory_info().rss / (1024 * 1024)
 
 
 class AnimalDataset(Dataset):
@@ -288,7 +297,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     print(f"Arguments: {args}")
-    
+    print(f"Initial RAM usage: {get_ram_usage():.2f} MB")
 
     device = torch.device(
         "cuda" if args.use_cuda and torch.cuda.is_available() else "cpu"
@@ -338,15 +347,51 @@ if __name__ == "__main__":
     print(f"Base path: {base_path}")
 
     # Load from pickle file (contains image arrays)
-    train_pkl_path = os.path.join(base_path, "train_data.pkl")
-    print(f"Loading training data from {train_pkl_path}...")
+    # train_pkl_path = os.path.join(base_path, "train_data.pkl")
+    # print(f"Loading training data from {train_pkl_path}...")
     
     # with open(train_pkl_path, 'rb') as f:
     #     dataframe = pickle.load(f)
     
+    bucket = "animal-classification-dss-works"
+    train_folder = "data/train_features"
+    test_folder = "data/test_features"
+    train_features_csv = "data/train_features.csv"
+    test_features_csv = "data/test_features.csv"
+    train_labels_csv = "data/train_labels.csv"
+    
+    s3_client = boto3.client("s3")
+
+    
+    train_cvs = s3_client.get_object(Bucket=bucket, Key=train_labels_csv)
+    train_cvs = train_cvs["Body"].read()
+    csv_buffer = BytesIO(train_cvs)
+    dataframe = pd.read_csv(csv_buffer)
+    print(dataframe.head())
+    
+    # processed_data = "processed/train_features/"
+    # numpy_data = []
+    # pbar = tqdm(dataframe.iterrows(), total=len(dataframe), desc="Processing data")
+    # for row in pbar:
+    #     print(row.id)
+    #     path = os.path.join(processed_data, row.id + ".jpg")
+    #     print(path)
+    #     image = s3_client.get_object(Bucket=bucket, Key=path)
+    #     image = image["Body"].read()
+    #     image = Image.open(BytesIO(image))
+    #     numpy_data.append(np.array(image))
+   
+    # dataframe["image"] = numpy_data
+    
+    # del numpy_data
+    # gc.collect()
+    print(f"After loading data RAM usage: {get_ram_usage():.2f} MB")
+    
+    
+    
     print(f"DataframeLoaded {len(dataframe)} training samples")
     print(f"Dataframe Columns: {list(dataframe.columns)}")
-    print(f"Dataframe sample:\n{dataframe.head()")
+    print(f"Dataframe sample:\n{dataframe.head()}")
     print(f"Dataframe shape: {dataframe.shape}")
 
     train_df, val_df = train_test_split(
@@ -423,11 +468,15 @@ if __name__ == "__main__":
     print("RUNNING TEST PREDICTIONS")
     print("=" * 60)
     
-    test_pkl_path = os.path.join(base_path, "test_data.pkl")
-    print(f"Loading test data from {test_pkl_path}...")
-    
+
+    test_cvs = s3_client.get_object(Bucket=bucket, Key=test_features_csv)
+    test_cvs = test_cvs["Body"].read()
+    csv_buffer = BytesIO(test_cvs)
+    test_dataframe = pd.read_csv(csv_buffer)
+    print(test_dataframe.head())
     # with open(test_pkl_path, 'rb') as f:
     #     test_dataframe = pickle.load(f)
+    
     
     print(f"Loaded {len(test_dataframe)} test samples")
     
