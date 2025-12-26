@@ -1,5 +1,7 @@
 import argparse
 import os
+from typing import Hashable
+from pandas.core.series import Series
 import pandas as pd
 import numpy as np
 from PIL import Image
@@ -63,7 +65,7 @@ def get_ram_usage():
 
 
 class AnimalDataset(Dataset):
-    def __init__(self, dataframe, transform=None):
+    def __init__(self, dataframe, transform=None, folder=""):
         """
         Dataset that loads images from numpy arrays stored in DataFrame
         
@@ -86,22 +88,39 @@ class AnimalDataset(Dataset):
             "rodent",
         ]
         self.labels = dataframe[label_columns].values.argmax(axis=1)
+        self.folder = folder
 
     def __len__(self):
         return len(self.dataframe)
 
     def __getitem__(self, idx):
         # Get image (numpy array) from DataFrame
-        image = self.dataframe.iloc[idx]["image"]
-        label = self.labels[idx]
-
-        # Convert numpy array to PIL Image for transforms
-        image = Image.fromarray(image.astype('uint8'))
+        id = self.dataframe.iloc[idx]["id"]
+        filename = id + ".jpg"
+        image_path = os.path.join(self.folder, filename)
+        
+        try:
+            image = Image.open(image_path).convert("RGB")
+        except Exception as e:
+            print(f"Error loading {image_path}: {e}")
+            image = Image.new('RGB', (224, 224))
 
         if self.transform:
             image = self.transform(image)
 
-        return image, label
+        return image, self.labels[idx]
+       
+        
+        # image = self.dataframe.iloc[idx]["image"]
+        # label = self.labels[idx]
+
+        # # Convert numpy array to PIL Image for transforms
+        # image = Image.fromarray(image.astype('uint8'))
+
+        # if self.transform:
+        #     image = self.transform(image)
+
+        # return image, label
 
     def show_image(self, idx):
         image = self.dataframe.iloc[idx]["image"]
@@ -119,13 +138,35 @@ class AnimalDataset(Dataset):
             image = self.transform(image)
         return image
     
+class TestDataset(Dataset):
+    def __init__(self, dataframe, transform=None, base_dir=""):
+        self.dataframe = dataframe.reset_index(drop=True)
+        self.transform = transform
+        self.base_dir = base_dir
+
+    def __len__(self):
+        return len(self.dataframe)
+
+    def __getitem__(self, idx):
+        row = self.dataframe.iloc[idx]
+        rel_path = row["filepath"]  # e.g. "test_features/abc.jpg"
+        image_path = os.path.join(self.base_dir, rel_path)
+
+        image = Image.open(image_path).convert("RGB")
+        if self.transform:
+            image = self.transform(image)
+
+        return image, row
+    
+    # def show_image(self, idx):
+    #     image = self.dataframe.iloc[idx]['filepath']
 
 
 def train_epoch(model, dataloader, criterion, optimizer, device):
     model.train()
     running_loss = 0.0
     correct = 0
-    total = 1
+    total = 0
 
     pbar = tqdm(dataloader, desc="Training")
     for images, labels in pbar:
@@ -234,19 +275,19 @@ class TrainingLogger:
         print(f"✓ Metrics saved to {self.output_dir}")
 
 
-def get_image_from_s3(bucket, key, region='us-west-1'):
-    """
-    Get image from S3 without downloading to disk
-    (Optional utility function - not used in main training pipeline)
-    """
-    try:
-        s3_client = boto3.client('s3', region_name=region)
-        response = s3_client.get_object(Bucket=bucket, Key=key)
-        image = Image.open(BytesIO(response["Body"].read()))
-        return image
-    except Exception as e:
-        print(f"Error loading image from S3: {e}")
-        return None
+# def get_image_from_s3(bucket, key, region='us-west-1'):
+#     """
+#     Get image from S3 without downloading to disk
+#     (Optional utility function - not used in main training pipeline)
+#     """
+#     try:
+#         s3_client = boto3.client('s3', region_name=region)
+#         response = s3_client.get_object(Bucket=bucket, Key=key)
+#         image = Image.open(BytesIO(response["Body"].read()))
+#         return image
+#     except Exception as e:
+#         print(f"Error loading image from S3: {e}")
+#         return None
 
 def predict_single_image(model, image_array, transform, device, class_names):
     """
@@ -287,7 +328,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=0.001)
-    parser.add_argument("--use-cuda", action="store_true", default=True)
+    parser.add_argument("--use-cuda", default=True)
 
     parser.add_argument("--model-dir", type=str, default=os.environ.get("SM_MODEL_DIR"))
     parser.add_argument(
@@ -352,20 +393,14 @@ if __name__ == "__main__":
     #     dataframe = pickle.load(f)
     
     bucket = "animal-classification-dss-works"
-    train_folder = "data/train_features"
-    test_folder = "data/test_features"
-    train_features_csv = "data/train_features.csv"
-    test_features_csv = "data/test_features.csv"
-    train_labels_csv = "data/train_labels.csv"
+    train_folder = os.path.join(base_path, "train_features")
+    test_folder = os.path.join(base_path, "test_features")
+    train_features_csv = os.path.join(base_path, "train_features.csv")
+    test_features_csv = os.path.join(base_path, "test_features.csv")
+    train_labels_csv = os.path.join(base_path, "train_labels.csv")
     
-    s3_client = boto3.client("s3")
 
-    
-    train_cvs = s3_client.get_object(Bucket=bucket, Key=train_labels_csv)
-    train_cvs = train_cvs["Body"].read()
-    csv_buffer = BytesIO(train_cvs)
-    dataframe = pd.read_csv(csv_buffer)
-    print(dataframe.head())
+    dataframe = pd.read_csv(train_labels_csv)
     
 
     print(f"After loading data RAM usage: {get_ram_usage():.2f} MB")
@@ -391,10 +426,10 @@ if __name__ == "__main__":
     print(f"Training samples: {len(train_df)}")
     print(f"Validation samples: {len(val_df)}")
     
-    train_dataset = AnimalDataset(train_df, transform=train_transform)
-    val_dataset = AnimalDataset(val_df, transform=val_transform)
+    train_dataset = AnimalDataset(train_df, transform=train_transform, base_dir=train_folder)
+    val_dataset = AnimalDataset(val_df, transform=val_transform, base_dir=train_folder)
 
-    batch_size = 32
+    batch_size = args.batch_size
     train_loader = DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True, num_workers=2
     )
@@ -412,6 +447,7 @@ if __name__ == "__main__":
     model = model.to(device)
     
     print(f"Model: {model}")
+    print()
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
@@ -450,15 +486,17 @@ if __name__ == "__main__":
     print("\n" + "=" * 60)
     print("RUNNING TEST PREDICTIONS")
     print("=" * 60)
-    
+        
 
-    test_cvs = s3_client.get_object(Bucket=bucket, Key=test_features_csv)
-    test_cvs = test_cvs["Body"].read()
-    csv_buffer = BytesIO(test_cvs)
-    test_dataframe = pd.read_csv(csv_buffer)
-    print(test_dataframe.head())
+        # test_cvs = s3_client.get_object(Bucket=bucket, Key=test_features_csv)
+        # test_cvs = test_cvs["Body"].read()
+        # csv_buffer = BytesIO(test_cvs)
+        # test_dataframe = pd.read_csv(csv_buffer)
+        # print(test_dataframe.head())
     # with open(test_pkl_path, 'rb') as f:
     #     test_dataframe = pickle.load(f)
+    test_dataframe = pd.read_csv(test_features_csv)
+    print(f"Test dataframe: {test_dataframe.head()}")
     
     
     logger.save()
@@ -471,44 +509,32 @@ if __name__ == "__main__":
     
     
     # Run predictions on test set
+    test_base = test_folder
+    test_dataset = TestDataset(test_dataframe, transform=val_transform, base_dir=test_base)
+
     model.eval()
     predictions = []
-    
-    pbar = tqdm(test_dataframe.iterrows(), total=len(test_dataframe), desc="Testing")
-    for index, row in pbar:
-        print(f"Index: {index}, Row: {row}")
-        # Get image from dataframe (numpy array)
-        image_array = row["image"]
-        image = Image.fromarray(image_array.astype('uint8')) # type: ignore
-        
-        # Apply validation transform
-        image_tensor = val_transform(image).unsqueeze(0).to(device) # type: ignore
-        
-        # Predict
-        with torch.no_grad():
+
+    with torch.no_grad():
+        for i in tqdm(range(len(test_dataset)), desc="Testing"): # type: ignore
+            image_tensor, row = test_dataset[i]
+            image_tensor = image_tensor.unsqueeze(0).to(device)
+
             output = model(image_tensor)
-            probabilities = torch.softmax(output, dim=1)
-            confidence, predicted = torch.max(probabilities, 1)
-        
-        predicted_class = class_names[predicted.item()] # type: ignore
-        confidence_score = confidence.item()
-        probs = probabilities.cpu().numpy()[0]  # All class probabilities
-        
-        # Create prediction record with all class probabilities
-        pred_record = {
-            'filename': row['filename'],
-            'predicted_class': predicted_class,
-            'confidence': confidence_score
-        }
-        
-        # Add individual class probabilities (like in dssLocal.ipynb)
-        for i, class_name in enumerate(class_names):
-            pred_record[f'{class_name}_prob'] = probs[i]
-        
-        predictions.append(pred_record)
-        
-        pbar.set_postfix(predicted=predicted_class, conf=f"{confidence_score:.3f}")
-    
+            probs = torch.softmax(output, dim=1).cpu().numpy()[0]
+            pred_idx = int(np.argmax(probs))
+            confidence = float(probs[pred_idx])
+
+            pred_record = {
+                "filepath": row["filepath"],
+                "predicted_class": class_names[pred_idx],
+                "confidence": confidence,
+            }
+            for j, cname in enumerate(class_names):
+                pred_record[f"{cname}_prob"] = float(probs[j])
+
+            predictions.append(pred_record)
+
     # Save predictions
     predictions_df = pd.DataFrame(predictions)
     predictions_df.head()
