@@ -14,29 +14,27 @@ import boto3
 import gc
 
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
-    accuracy_score,
-    confusion_matrix,
-    precision_score,
-    recall_score,
-    f1_score,
-)
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.impute import KNNImputer
-from sklearn.linear_model import LinearRegression
-from sklearn import tree
-from sklearn.svm import SVC
+# from sklearn.linear_model import LogisticRegression
+# from sklearn.metrics import (
+#     accuracy_score,
+#     confusion_matrix,
+#     precision_score,
+#     recall_score,
+#     f1_score,
+# # )
+# from sklearn.preprocessing import StandardScaler
+# from sklearn.ensemble import RandomForestClassifier
+# from sklearn.neighbors import KNeighborsClassifier
+# from sklearn.impute import KNNImputer
+# from sklearn.linear_model import LinearRegression
+# from sklearn import tree
+# from sklearn.svm import SVC
 
 import torch
 
 import torchvision
-import torch.nn as nn
-import torch.optim as optim
+
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets
 from torch.utils.data import Dataset, DataLoader
 from torchvision.models import resnet18, ResNet18_Weights
 
@@ -50,7 +48,7 @@ import pandas as pd
 import numpy as np
 
 import matplotlib.pyplot as plt
-import seaborn as sns
+# import seaborn as sns
 import os
 
 from PIL import Image
@@ -289,7 +287,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=0.001)
-    parser.add_argument("--use-cuda", type=bool, default=False)
+    parser.add_argument("--use-cuda", action="store_true", default=True)
 
     parser.add_argument("--model-dir", type=str, default=os.environ.get("SM_MODEL_DIR"))
     parser.add_argument(
@@ -369,22 +367,7 @@ if __name__ == "__main__":
     dataframe = pd.read_csv(csv_buffer)
     print(dataframe.head())
     
-    # processed_data = "processed/train_features/"
-    # numpy_data = []
-    # pbar = tqdm(dataframe.iterrows(), total=len(dataframe), desc="Processing data")
-    # for row in pbar:
-    #     print(row.id)
-    #     path = os.path.join(processed_data, row.id + ".jpg")
-    #     print(path)
-    #     image = s3_client.get_object(Bucket=bucket, Key=path)
-    #     image = image["Body"].read()
-    #     image = Image.open(BytesIO(image))
-    #     numpy_data.append(np.array(image))
-   
-    # dataframe["image"] = numpy_data
-    
-    # del numpy_data
-    # gc.collect()
+
     print(f"After loading data RAM usage: {get_ram_usage():.2f} MB")
     
     
@@ -394,17 +377,17 @@ if __name__ == "__main__":
     print(f"Dataframe sample:\n{dataframe.head()}")
     print(f"Dataframe shape: {dataframe.shape}")
 
-    train_df, val_df = train_test_split(
+    train_df, val_df = train_test_split( # type: ignore
         dataframe,
         test_size=0.25,
         random_state=42,
-        stratify=dataframe[class_names].values.argmax(axis=1),
+        stratify=np.argmax(dataframe[class_names].values, axis=1), # type: ignore
     )
     
-    print(f"Train DataFrame sample:\n{train_df.head()}")
-    print(f"Train DataFrame shape: {train_df.shape}")
-    print(f"Validation DataFrame sample:\n{val_df.head()}")
-    print(f"Validation DataFrame shape: {val_df.shape}")
+    print(f"Train DataFrame sample:\n{train_df.head()}") # type: ignore
+    print(f"Train DataFrame shape: {train_df.shape}") # type: ignore
+    print(f"Validation DataFrame sample:\n{val_df.head()}") # type: ignore
+    print(f"Validation DataFrame shape: {val_df.shape}") # type: ignore
     print(f"Training samples: {len(train_df)}")
     print(f"Validation samples: {len(val_df)}")
     
@@ -429,7 +412,6 @@ if __name__ == "__main__":
     model = model.to(device)
     
     print(f"Model: {model}")
-    print(f"Model device: {model.device}")
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
@@ -456,7 +438,8 @@ if __name__ == "__main__":
         # Save best model
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), "sagemaker_best_resnet18_model.pth")
+            save_path = os.path.join(args.model_dir, "sagemaker_best_resnet18_model.pth")
+            torch.save(model.state_dict(), save_path)
             print(f"✓ Best model saved! (Val Acc: {val_acc:.4f})")
             
 
@@ -478,7 +461,14 @@ if __name__ == "__main__":
     #     test_dataframe = pickle.load(f)
     
     
+    logger.save()
+    print("Saving model...")
+    save_path = os.path.join(args.model_dir, "model.pth")
+    torch.save(model.state_dict(), save_path)
+    print(f"Model saved to {save_path}")
     print(f"Loaded {len(test_dataframe)} test samples")
+    
+    
     
     # Run predictions on test set
     model.eval()
@@ -489,10 +479,10 @@ if __name__ == "__main__":
         print(f"Index: {index}, Row: {row}")
         # Get image from dataframe (numpy array)
         image_array = row["image"]
-        image = Image.fromarray(image_array.astype('uint8'))
+        image = Image.fromarray(image_array.astype('uint8')) # type: ignore
         
         # Apply validation transform
-        image_tensor = val_transform(image).unsqueeze(0).to(device)
+        image_tensor = val_transform(image).unsqueeze(0).to(device) # type: ignore
         
         # Predict
         with torch.no_grad():
@@ -500,7 +490,7 @@ if __name__ == "__main__":
             probabilities = torch.softmax(output, dim=1)
             confidence, predicted = torch.max(probabilities, 1)
         
-        predicted_class = class_names[predicted.item()]
+        predicted_class = class_names[predicted.item()] # type: ignore
         confidence_score = confidence.item()
         probs = probabilities.cpu().numpy()[0]  # All class probabilities
         
@@ -540,9 +530,5 @@ if __name__ == "__main__":
     # predicted_class, confidence, probs = predict_image( model, test_image_path, val_transform, device, class_names)
 
      
-    logger.save()
-    print("Saving model...")
-    save_path = os.path.join(args.model_dir, "model.pth")
-    torch.save(model.state_dict(), save_path)
-    print(f"Model saved to {save_path}")
+
 
