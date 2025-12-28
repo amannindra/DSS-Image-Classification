@@ -325,10 +325,10 @@ def predict_single_image(model, image_array, transform, device, class_names):
 if __name__ == "__main__":
     print("Starting training...")
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=10)
+    parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=0.001)
-    parser.add_argument("--use-cuda", default=True)
+    parser.add_argument("--use-cuda", type=lambda x: (str(x).lower() == 'true'), default=True)
 
     parser.add_argument("--model-dir", type=str, default=os.environ.get("SM_MODEL_DIR"))
     parser.add_argument(
@@ -426,8 +426,8 @@ if __name__ == "__main__":
     print(f"Training samples: {len(train_df)}")
     print(f"Validation samples: {len(val_df)}")
     
-    train_dataset = AnimalDataset(train_df, transform=train_transform, base_dir=train_folder)
-    val_dataset = AnimalDataset(val_df, transform=val_transform, base_dir=train_folder)
+    train_dataset = AnimalDataset(train_df, transform=train_transform, folder=train_folder)
+    val_dataset = AnimalDataset(val_df, transform=val_transform, folder=train_folder)
 
     batch_size = args.batch_size
     train_loader = DataLoader(
@@ -509,43 +509,44 @@ if __name__ == "__main__":
     
     
     # Run predictions on test set
-    test_base = test_folder
-    test_dataset = TestDataset(test_dataframe, transform=val_transform, base_dir=test_base)
+    # test_base = test_folder
+    # print(f"Test base: {test_base}")
+    # test_dataset = TestDataset(test_dataframe, transform=val_transform, base_dir=test_base)
 
-    model.eval()
-    predictions = []
+    # model.eval()
+    # predictions = []
 
-    with torch.no_grad():
-        for i in tqdm(range(len(test_dataset)), desc="Testing"): # type: ignore
-            image_tensor, row = test_dataset[i]
-            image_tensor = image_tensor.unsqueeze(0).to(device)
+    # with torch.no_grad():
+    #     for i in tqdm(range(len(test_dataset)), desc="Testing"): # type: ignore
+    #         image_tensor, row = test_dataset[i]
+    #         image_tensor = image_tensor.unsqueeze(0).to(device)
 
-            output = model(image_tensor)
-            probs = torch.softmax(output, dim=1).cpu().numpy()[0]
-            pred_idx = int(np.argmax(probs))
-            confidence = float(probs[pred_idx])
+    #         output = model(image_tensor)
+    #         probs = torch.softmax(output, dim=1).cpu().numpy()[0]
+    #         pred_idx = int(np.argmax(probs))
+    #         confidence = float(probs[pred_idx])
 
-            pred_record = {
-                "filepath": row["filepath"],
-                "predicted_class": class_names[pred_idx],
-                "confidence": confidence,
-            }
-            for j, cname in enumerate(class_names):
-                pred_record[f"{cname}_prob"] = float(probs[j])
+    #         pred_record = {
+    #             "filepath": row["filepath"],
+    #             "predicted_class": class_names[pred_idx],
+    #             "confidence": confidence,
+    #         }
+    #         for j, cname in enumerate(class_names):
+    #             pred_record[f"{cname}_prob"] = float(probs[j])
 
-            predictions.append(pred_record)
+    #         predictions.append(pred_record)
 
-    # Save predictions
-    predictions_df = pd.DataFrame(predictions)
-    predictions_df.head()
-    predictions_path = os.path.join(args.model_dir, "test_predictions.csv")
-    predictions_df.to_csv(predictions_path, index=False)
+    # # Save predictions
+    # predictions_df = pd.DataFrame(predictions)
+    # predictions_df.head()
+    # predictions_path = os.path.join(args.model_dir, "test_predictions.csv")
+    # predictions_df.to_csv(predictions_path, index=False)
     
-    print(f"\n✓ Test predictions saved to {predictions_path}")
-    print(f"  Columns: {list(predictions_df.columns)}")
-    print(f"  Total predictions: {len(predictions_df)}")
-    print(f"\nFirst few predictions:")
-    print(predictions_df.head())
+    # print(f"\n✓ Test predictions saved to {predictions_path}")
+    # print(f"  Columns: {list(predictions_df.columns)}")
+    # print(f"  Total predictions: {len(predictions_df)}")
+    # print(f"\nFirst few predictions:")
+    # print(predictions_df.head())
     
     
     
