@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
+
 import sys
 # import pickle
 from io import BytesIO
@@ -35,7 +36,7 @@ from sklearn.model_selection import train_test_split
 import torch
 
 import torchvision
-
+from torchvision.transforms import AutoAugment, AutoAugmentPolicy
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
 from torchvision.models import resnet18, ResNet18_Weights
@@ -55,6 +56,7 @@ import os
 
 from PIL import Image
 from tqdm import tqdm
+
 
 
 def get_ram_usage():
@@ -100,27 +102,21 @@ class AnimalDataset(Dataset):
         image_path = os.path.join(self.folder, filename)
         
         try:
+            if not os.path.exists(image_path):
+                raise FileNotFoundError(f"Image file not found: {image_path}")
             image = Image.open(image_path).convert("RGB")
         except Exception as e:
-            print(f"Error loading {image_path}: {e}")
-            image = Image.new('RGB', (224, 224))
+            # Log error but don't print for every missing image to avoid spam
+            if idx < 10:  # Only print first 10 errors
+                print(f"Error loading {image_path}: {e}")
+            # Create a blank image as fallback (will hurt training but prevents crash)
+            image = Image.new('RGB', (224, 224), color=(128, 128, 128))
 
         if self.transform:
             image = self.transform(image)
 
         return image, self.labels[idx]
-       
-        
-        # image = self.dataframe.iloc[idx]["image"]
-        # label = self.labels[idx]
-
-        # # Convert numpy array to PIL Image for transforms
-        # image = Image.fromarray(image.astype('uint8'))
-
-        # if self.transform:
-        #     image = self.transform(image)
-
-        # return image, label
+    
 
     def show_image(self, idx):
         image = self.dataframe.iloc[idx]["image"]
@@ -162,17 +158,34 @@ class TestDataset(Dataset):
     #     image = self.dataframe.iloc[idx]['filepath']
 
 
-def train_epoch(model, dataloader, criterion, optimizer, device):
+def train_epoch(model, dataloader, criterion, optimizer, device, mixup_enabled=False, num_classes=8):
     model.train()
     running_loss = 0.0
     correct = 0
     total = 0
+    
+    # Mixup is currently disabled - if enabled, mixup_fn would need to be implemented
+    # mixup_fn = Mixup(
+    #     mixup_alpha=0.2,
+    #     cutmix_alpha=0,      # set >0 if you also want CutMix
+    #     prob=1.0,              # probability to apply
+    #     switch_prob=0.0,
+    #     label_smoothing=0.0,   # Changed from 1.0 to 0.0 (1.0 was too high)
+    #     num_classes=num_classes
+    # )
 
+    # print(f"Mixup enabled: {mixup_enabled}")
+    if mixup_enabled:
+        raise NotImplementedError("Mixup is not currently implemented. Set mixup_enabled=False or implement Mixup class.")
+    
     pbar = tqdm(dataloader, desc="Training")
     for images, labels in pbar:
         # print(images)
         # print(labels)
         images, labels = images.to(device), labels.to(device)
+        # Mixup disabled - if enabled, uncomment and implement mixup_fn above
+        # if mixup_enabled:
+        #     images, labels = mixup_fn(images, labels)
 
         # # Zero the parameter gradients
         optimizer.zero_grad()
@@ -187,9 +200,19 @@ def train_epoch(model, dataloader, criterion, optimizer, device):
 
         # Statistics
         running_loss += loss.item() * images.size(0)
-        _, predicted = torch.max(outputs, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
+        
+        # For accuracy calculation with Mixup, use hard labels if available
+        if mixup_enabled and labels.dim() > 1:
+            # If labels are soft targets (one-hot), convert to hard labels for accuracy
+            _, hard_labels = torch.max(labels, 1)
+            _, predicted = torch.max(outputs, 1)
+            total += labels.size(0)
+            correct += (predicted == hard_labels).sum().item()
+        else:
+            # Standard hard labels
+            _, predicted = torch.max(outputs, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
 
         pbar.set_postfix(loss=f"{loss.item():.4f}", acc=f"{correct / total:.4f}")
 
@@ -337,11 +360,25 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(f"Arguments: {args}")
     print(f"Initial RAM usage: {get_ram_usage():.2f} MB")
+    
+    # Validate model directory exists or create it
+    if args.model_dir is None:
+        args.model_dir = "/tmp/models"  # Fallback for local testing
+        print(f"WARNING: SM_MODEL_DIR not set, using fallback: {args.model_dir}")
+    os.makedirs(args.model_dir, exist_ok=True)
+    print(f"Model directory: {args.model_dir}")
 
     device = torch.device(
         "cuda" if args.use_cuda and torch.cuda.is_available() else "cpu"
     )
     print(f"Using device: {device}")
+    
+    # Validate CUDA availability if requested
+    if args.use_cuda and not torch.cuda.is_available():
+        print("WARNING: CUDA requested but not available. Falling back to CPU.")
+    elif args.use_cuda and torch.cuda.is_available():
+        print(f"CUDA device: {torch.cuda.get_device_name(0)}")
+        print(f"CUDA memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB")
 
     class_names = [
         "antelope_duiker",
@@ -354,11 +391,14 @@ if __name__ == "__main__":
         "rodent",
     ]
     num_classes = len(class_names)
-
+    output_channels = 3
+    
+    # Version 1 Base Architecture
+    
     train_transform = transforms.Compose(
         [
             transforms.Resize((224, 224)),
-            transforms.Grayscale(num_output_channels=3),
+            transforms.Grayscale(num_output_channels=output_channels),
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(10),
             transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
@@ -366,15 +406,51 @@ if __name__ == "__main__":
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
-
+    
     val_transform = transforms.Compose(
         [
             transforms.Resize((224, 224)),
-            transforms.Grayscale(num_output_channels=3),
+            transforms.Grayscale(num_output_channels=output_channels),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
+    
+    
+    
+
+    # Version 2:
+    
+    # img_size = 224
+
+    # train_transform = transforms.Compose(
+    #     [
+    #         transforms.RandomResizedCrop(
+    #             img_size,
+    #             scale=(0.6, 1.0),
+    #             ratio=(0.9, 1.1)
+    #         ),
+    #         transforms.RandomHorizontalFlip(),
+    #         transforms.RandomRotation(10),
+    #         transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+    #         transforms.ToTensor(),
+    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    #     ]
+    # )
+
+    # val_transform = transforms.Compose(
+    #     [
+    #         transforms.Resize((img_size, img_size)),
+    #         transforms.ToTensor(),
+    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    #     ]
+    # )
+    
+    print(f"Train transform: {train_transform}")
+    print(f"Val transform: {val_transform}")
+    
+    
+   
     '''
     Loading preprocessed data from pickle file.
     DataFrame contains:
@@ -384,6 +460,10 @@ if __name__ == "__main__":
     '''
     base_path = args.data_dir
     print(f"Base path: {base_path}")
+    
+    # Validate base path exists
+    if not os.path.exists(base_path):
+        raise FileNotFoundError(f"Data directory does not exist: {base_path}")
 
     # Load from pickle file (contains image arrays)
     # train_pkl_path = os.path.join(base_path, "train_data.pkl")
@@ -399,8 +479,19 @@ if __name__ == "__main__":
     test_features_csv = os.path.join(base_path, "test_features.csv")
     train_labels_csv = os.path.join(base_path, "train_labels.csv")
     
+    # Validate required files exist
+    if not os.path.exists(train_labels_csv):
+        raise FileNotFoundError(f"Training labels CSV not found: {train_labels_csv}")
+    if not os.path.exists(train_folder):
+        raise FileNotFoundError(f"Training images folder not found: {train_folder}")
+    if not os.path.exists(test_features_csv):
+        print(f"Warning: Test features CSV not found: {test_features_csv}")
 
     dataframe = pd.read_csv(train_labels_csv)
+    
+    # Validate dataframe is not empty
+    if len(dataframe) == 0:
+        raise ValueError("Training dataframe is empty!")
     
 
     print(f"After loading data RAM usage: {get_ram_usage():.2f} MB")
@@ -441,7 +532,7 @@ if __name__ == "__main__":
     print(f"Train batches: {len(train_loader)}")
     print(f"Val batches: {len(val_loader)}")
     
-    model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+    model = models.resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
     num_features = model.fc.in_features
     model.fc = nn.Linear(num_features, num_classes)
     model = model.to(device)
@@ -449,24 +540,32 @@ if __name__ == "__main__":
     print(f"Model: {model}")
     print()
 
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer,
-        mode="min",
-        patience=2,
-        factor=0.5,
-    )
+
+    # Mixup configuration (currently disabled)
+    mixup_enabled = False
     
+    # if mixup_enabled:
+    #     criterion = SoftTargetCrossEntropy()
+    # else:
+    #     criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss()
+
+    optimizer = optim.AdamW(model.parameters(), lr=args.learning_rate)
+    # scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+    #     optimizer,
+    #     mode="min",
+    #     patience=2,
+    #     factor=0.5,
+    # )
     
     logger = TrainingLogger()
     model.train()
     best_val_acc = 0.0
     for epoch in range(args.epochs):
         print(f"Epoch {epoch+1}/{args.epochs}")
-        train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device)
+        train_loss, train_acc = train_epoch(model, train_loader, criterion, optimizer, device, mixup_enabled=mixup_enabled, num_classes=num_classes)
         val_loss, val_acc, val_preds, val_labels = validate_epoch(model, val_loader, criterion, device)
-        scheduler.step(val_loss)
+        # scheduler.step(val_loss)
 
         # Save history
         logger.log(epoch, train_loss, train_acc, val_loss, val_acc)
@@ -492,11 +591,20 @@ if __name__ == "__main__":
         # test_cvs = test_cvs["Body"].read()
         # csv_buffer = BytesIO(test_cvs)
         # test_dataframe = pd.read_csv(csv_buffer)
+        
         # print(test_dataframe.head())
     # with open(test_pkl_path, 'rb') as f:
     #     test_dataframe = pickle.load(f)
-    test_dataframe = pd.read_csv(test_features_csv)
-    print(f"Test dataframe: {test_dataframe.head()}")
+    
+    # Load test data if available (optional)
+    # if os.path.exists(test_features_csv):
+    #     test_dataframe = pd.read_csv(test_features_csv)
+    #     print(f"Test dataframe: {test_dataframe.head()}")
+    #     print(f"Loaded {len(test_dataframe)} test samples")
+    # else:
+    #     print(f"Test features CSV not found: {test_features_csv}")
+    #     print("Skipping test data loading (this is optional)")
+    #     test_dataframe = None
     
     
     logger.save()
@@ -504,7 +612,8 @@ if __name__ == "__main__":
     save_path = os.path.join(args.model_dir, "model.pth")
     torch.save(model.state_dict(), save_path)
     print(f"Model saved to {save_path}")
-    print(f"Loaded {len(test_dataframe)} test samples")
+    # if test_dataframe is not None:
+    #     print(f"Test samples available: {len(test_dataframe)}")
     
     
     
