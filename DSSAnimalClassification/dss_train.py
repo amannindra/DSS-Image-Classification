@@ -10,11 +10,10 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 
-import sys
+# import sys
 # import pickle
-from io import BytesIO
-import boto3
-import gc
+# from io import BytesIO
+
 
 from sklearn.model_selection import train_test_split
 # from sklearn.linear_model import LogisticRegression
@@ -35,11 +34,11 @@ from sklearn.model_selection import train_test_split
 
 import torch
 
-import torchvision
+# import torchvision
 from torchvision.transforms import AutoAugment, AutoAugmentPolicy
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
-from torchvision.models import resnet18, ResNet18_Weights
+from torchvision.models import resnet18, ResNet18_Weights, ResNet50_Weights
 
 import torchvision.models as models
 import os
@@ -393,15 +392,18 @@ if __name__ == "__main__":
     num_classes = len(class_names)
     output_channels = 3
     
-    # Version 1 Base Architecture
+    img_size = 224
+    
+    print(f"Class names: {class_names}")
+    print(f"Number of classes: {num_classes}")
+    print(f"Output channels: {output_channels}")
+    print(f"Image size: {img_size}")
+    
+    # Basic resnet18 Model and Resnet50 model
     
     train_transform = transforms.Compose(
         [
-            transforms.Resize((224, 224)),
-            transforms.Grayscale(num_output_channels=output_channels),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomRotation(10),
-            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+            transforms.Resize((img_size, img_size)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
@@ -409,12 +411,40 @@ if __name__ == "__main__":
     
     val_transform = transforms.Compose(
         [
-            transforms.Resize((224, 224)),
-            transforms.Grayscale(num_output_channels=output_channels),
+            transforms.Resize((img_size, img_size)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )
+    
+    print(f"Train transform: {train_transform}")
+    print(f"Val transform: {val_transform}")
+    
+    
+    
+    
+    # Version 1 Base Architecture
+    
+    # train_transform = transforms.Compose(
+    #     [
+    #         transforms.Resize((img_size, img_size)),
+    #         transforms.Grayscale(num_output_channels=output_channels),
+    #         transforms.RandomHorizontalFlip(),
+    #         transforms.RandomRotation(10),
+    #         transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+    #         transforms.ToTensor(),
+    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    #     ]
+    # )
+    
+    # val_transform = transforms.Compose(
+    #     [
+    #         transforms.Resize((img_size, img_size)),
+    #         transforms.Grayscale(num_output_channels=output_channels),
+    #         transforms.ToTensor(),
+    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    #     ]
+    # )
     
     
     
@@ -446,10 +476,8 @@ if __name__ == "__main__":
     #     ]
     # )
     
-    print(f"Train transform: {train_transform}")
-    print(f"Val transform: {val_transform}")
-    
-    
+
+ 
    
     '''
     Loading preprocessed data from pickle file.
@@ -532,7 +560,13 @@ if __name__ == "__main__":
     print(f"Train batches: {len(train_loader)}")
     print(f"Val batches: {len(val_loader)}")
     
-    model = models.resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+    
+    specific_model = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
+    
+    stringform = str(ResNet50_Weights.IMAGENET1K_V2)
+    stringform = stringform.replace(".", "")
+    print(f"String form: {stringform}")
+    model = specific_model
     num_features = model.fc.in_features
     model.fc = nn.Linear(num_features, num_classes)
     model = model.to(device)
@@ -540,17 +574,22 @@ if __name__ == "__main__":
     print(f"Model: {model}")
     print()
 
-
     # Mixup configuration (currently disabled)
     mixup_enabled = False
+    print(f"Mixup enabled: {mixup_enabled}")
+    print()
     
     # if mixup_enabled:
     #     criterion = SoftTargetCrossEntropy()
     # else:
     #     criterion = nn.CrossEntropyLoss()
     criterion = nn.CrossEntropyLoss()
+    print(f"Criterion: {criterion}")
+    print()
 
     optimizer = optim.AdamW(model.parameters(), lr=args.learning_rate)
+    print(f"Optimizer: {optimizer}")
+    print()
     # scheduler = optim.lr_scheduler.ReduceLROnPlateau(
     #     optimizer,
     #     mode="min",
@@ -573,9 +612,10 @@ if __name__ == "__main__":
         # Save best model
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            save_path = os.path.join(args.model_dir, "sagemaker_best_resnet18_model.pth")
+
+            save_path = os.path.join(args.model_dir, "sagemaker_best_resnet50model.pth")
             torch.save(model.state_dict(), save_path)
-            print(f"✓ Best model saved! (Val Acc: {val_acc:.4f})")
+            print(f"✓ Best model saved! (Val Acc: {val_acc:.4f}), path: {save_path}")
             
 
 
@@ -595,7 +635,7 @@ if __name__ == "__main__":
         # print(test_dataframe.head())
     # with open(test_pkl_path, 'rb') as f:
     #     test_dataframe = pickle.load(f)
-    
+
     # Load test data if available (optional)
     # if os.path.exists(test_features_csv):
     #     test_dataframe = pd.read_csv(test_features_csv)
@@ -609,7 +649,7 @@ if __name__ == "__main__":
     
     logger.save()
     print("Saving model...")
-    save_path = os.path.join(args.model_dir, "model.pth")
+    save_path = os.path.join(args.model_dir, "final_basic_resnet50_model.pth")
     torch.save(model.state_dict(), save_path)
     print(f"Model saved to {save_path}")
     # if test_dataframe is not None:
