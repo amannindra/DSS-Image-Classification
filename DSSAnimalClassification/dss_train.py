@@ -493,12 +493,6 @@ if __name__ == "__main__":
     if not os.path.exists(base_path):
         raise FileNotFoundError(f"Data directory does not exist: {base_path}")
 
-    # Load from pickle file (contains image arrays)
-    # train_pkl_path = os.path.join(base_path, "train_data.pkl")
-    # print(f"Loading training data from {train_pkl_path}...")
-    
-    # with open(train_pkl_path, 'rb') as f:
-    #     dataframe = pickle.load(f)
     
     bucket = "animal-classification-dss-works"
     train_folder = os.path.join(base_path, "train_features")
