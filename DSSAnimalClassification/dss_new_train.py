@@ -12,10 +12,12 @@ from torch.utils.data import TensorDataset, DataLoader
 from torchvision.ops import StochasticDepth
 from torch.cuda.amp import GradScaler, autocast
 import sys
+from torch.optim.lr_scheduler import CosineAnnealingLR
 # import pickle
 # from io import BytesIO
 # import boto3
 
+import copy
 import json
 import gc
 
@@ -95,11 +97,12 @@ from sklearn import tree
 from sklearn.svm import SVC
 
 
-from torchvision.models import resnet18, ResNet18_Weights
+from torchvision.models import resnet18, ResNet18_Weights, swin_b
 import torch
 
 import torchvision
-from torchvision.models import Swin_T_Weights, ResNet18_Weights
+from torchvision.models import Swin_T_Weights, ResNet18_Weights, Swin_S_Weights, Swin_B_Weights
+import torchvision.models as models
 from torchvision.transforms import AutoAugment, AutoAugmentPolicy
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
@@ -137,14 +140,12 @@ def get_gpu_memory():
     return 0, 0
 
 
-class AnimalDataset(Dataset):
+class AnimalDatasetSwin(Dataset):
     def __init__(self, dataframe, transform=None, folder="", img_size=224):
-   
         self.dataframe = dataframe.reset_index(drop=True)
-        
         self.transform = transform
         self.img_size = img_size
-        # Extract labels (one-hot to class index)
+        self.folder = folder
         label_columns = [
             "antelope_duiker",
             "bird",
@@ -155,53 +156,105 @@ class AnimalDataset(Dataset):
             "monkey_prosimian",
             "rodent",
         ]
-        y = dataframe[label_columns].values
-        assert (y.sum(axis=1) == 1).all()
-        self.labels = y.argmax(axis=1).astype("int64")
-        self.folder = folder
-
+        self.labels = dataframe[label_columns].values.argmax(axis=1)
     def __len__(self):
         return len(self.dataframe)
-
     def __getitem__(self, idx):
-        # Get image (numpy array) from DataFrame
         id = self.dataframe.iloc[idx]["id"]
         filename = id + ".jpg"
         image_path = os.path.join(self.folder, filename)
-        
         try:
             if not os.path.exists(image_path):
                 raise FileNotFoundError(f"Image file not found: {image_path}")
             image = Image.open(image_path).convert("RGB")
         except Exception as e:
-            # Log error but don't print for every missing image to avoid spam
-            if idx < 10:  # Only print first 10 errors
-                print(f"Error loading {image_path}: {e}")
-            # Create a blank image as fallback (will hurt training but prevents crash)
+            print(f"Error loading {image_path}: {e}")
             image = Image.new('RGB', (self.img_size, self.img_size), color=(128, 128, 128))
-
         if self.transform:
             image = self.transform(image)
-
-        return image, self.labels[idx]
+        return image, self.labels[idx], self.dataframe.iloc[idx]["id"]
     def get_y(self):
         return self.labels
-
     def show_image(self, idx):
         image = self.dataframe.iloc[idx]["image"]
         plt.imshow(image)
         plt.axis("off")
         plt.show()
 
-    def return_numpy_image(self, idx):
-        return self.dataframe.iloc[idx]["image"]
+# class AnimalDataset(Dataset):
+#     def __init__(self, dataframe, transform=None, folder="", img_size=224):
+   
+#         self.dataframe = dataframe.reset_index(drop=True)
+        
+#         self.transform = transform
+#         self.img_size = img_size
+#         # Extract labels (one-hot to class index)
+#         label_columns = [
+#             "antelope_duiker",
+#             "bird",
+#             "blank",
+#             "civet_genet",
+#             "hog",
+#             "leopard",
+#             "monkey_prosimian",
+#             "rodent",
+#         ]
+#         y = dataframe[label_columns].values
+#         assert (y.sum(axis=1) == 1).all()
+#         self.labels = y.argmax(axis=1).astype("int64")
+#         self.folder = folder
 
-    def return_transformed_image(self, idx):
-        image = self.dataframe.iloc[idx]["image"]
-        image = Image.fromarray(image.astype('uint8'))
-        if self.transform:
-            image = self.transform(image)
-        return image
+#     def __len__(self):
+#         return len(self.dataframe)
+
+#     def __getitem__(self, idx):
+#         # Get image (numpy array) from DataFrame
+#         id = self.dataframe.iloc[idx]["id"]
+#         filename = id + ".jpg"
+#         image_path = os.path.join(self.folder, filename)
+        
+#         try:
+#             if not os.path.exists(image_path):
+#                 raise FileNotFoundError(f"Image file not found: {image_path}")
+#             image = Image.open(image_path).convert("RGB")
+#         except Exception as e:
+#             # Log error but don't print for every missing image to avoid spam
+#             if idx < 10:  # Only print first 10 errors
+#                 print(f"Error loading {image_path}: {e}")
+#             # Create a blank image as fallback (will hurt training but prevents crash)
+#             image = Image.new('RGB', (self.img_size, self.img_size), color=(128, 128, 128))
+
+#         if self.transform:
+#             image = self.transform(image)
+
+#         return image, self.labels[idx], self.dataframe.iloc[idx]["id"]
+#     def get_y(self):
+#         return self.labels
+
+#     def show_image(self, idx):
+#         image = self.dataframe.iloc[idx]["image"]
+#         plt.imshow(image)
+#         plt.axis("off")
+#         plt.show()
+
+#     def return_numpy_image(self, idx):
+#         return self.dataframe.iloc[idx]["image"]
+
+#     def return_transformed_image(self, idx):
+#         image = self.dataframe.iloc[idx]["image"]
+#         image = Image.fromarray(image.astype('uint8'))
+#         if self.transform:
+#             image = self.transform(image)
+#         return image
+class NumpyEncoder(json.JSONEncoder):
+    def default_encoder(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NumpyEncoder, self).default_encoder(obj)
 
 def train_epoch(model, dataloader, criterion, optimizer, device, class_names, num_classes=8):
     model.train()
@@ -211,14 +264,16 @@ def train_epoch(model, dataloader, criterion, optimizer, device, class_names, nu
     all_preds = []
     all_labels = []
     all_probs = []  # For storing prediction probabilities
+    all_ids = []
     
     # Initialize Scaler for Mixed Precision
     
     # pbar = tqdm(dataloader, desc="Training")
     print("Training...")
     pbar = tqdm(dataloader, desc="Training")
-    for images, labels in pbar:
+    for images, labels, ids in pbar:
         images, labels = images.to(device), labels.to(device)
+        # ids are strings, don't move to device
 
         optimizer.zero_grad()
 
@@ -253,59 +308,70 @@ def train_epoch(model, dataloader, criterion, optimizer, device, class_names, nu
         
         # Get probabilities for additional metrics
         probs = torch.softmax(outputs, dim=1)
-        all_probs.extend(probs.detach().cpu().numpy())
+        all_probs.extend(probs.detach().cpu().numpy().tolist())
         
         _, predicted = torch.max(outputs, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
-        all_preds.extend(predicted.cpu().numpy())
-        all_labels.extend(labels.cpu().numpy())
+        all_preds.extend(predicted.detach().cpu().numpy().tolist())
+        all_ids.extend(ids)  # ids are already strings, not tensors
+        all_labels.extend(labels.detach().cpu().numpy().tolist())
         
         pbar.set_postfix(loss=f"{loss.item():.4f}", acc=f"{correct / total:.4f}")
 
         # pbar.set_postfix(loss=f"{loss.item():.4f}", acc=f"{correct / total:.4f}")
     
-    # Convert to numpy arrays
+    # Convert to numpy arrays for easier manipulation
     all_probs = np.array(all_probs)
-    all_labels_array = np.array(all_labels)
-    all_preds_array = np.array(all_preds)
+    all_labels = np.array(all_labels)
+    all_preds = np.array(all_preds)
+    # all_ids stays as list (strings)
     
-    # Basic metrics
-    report = classification_report(all_labels_array, all_preds_array, target_names=class_names, output_dict=True)
-    # Confusion matrix with numeric labels (0 to num_classes-1)
-    report['confusion_matrix'] = confusion_matrix(all_labels_array, all_preds_array).tolist()
-    report['loss'] = running_loss / total
-    report['acc'] = correct / total
+    # Basic metrics - classification_report returns dict with macro avg, weighted avg, accuracy
+    report = classification_report(all_labels, all_preds, target_names=class_names, output_dict=True, zero_division=0)
+    
+    # Confusion matrix as list (not numpy array)
+    report['confusion_matrix'] = confusion_matrix(all_labels, all_preds).tolist()
+    
+    # Scalar metrics (already Python types)
+    report['loss'] = float(running_loss / total)
+    report['acc'] = float(correct / total)
+    report['ids'] = all_ids  # List of strings (will be removed in save())
     epoch_loss = running_loss / total
-    epoch_acc = accuracy_score(all_labels_array, all_preds_array)
+    epoch_acc = float(accuracy_score(all_labels, all_preds))
     
     # Additional valuable metrics
-    # 1. Log Loss (measures prediction confidence quality)
-    report['log_loss'] = log_loss(all_labels_array, all_probs)
+    # 1. Log Loss (returns numpy.float64, ensure it's Python float)
+    report['log_loss'] = float(log_loss(all_labels, all_probs))
     
-    # 2. Top-3 Accuracy (useful for multi-class: is correct class in top 3 predictions?)
+    # 2. Top-3 Accuracy (Python float)
     top3_correct = 0
-    for i, label in enumerate(all_labels_array):
-        top3_preds = np.argsort(all_probs[i])[-3:]  # Get indices of top 3 predictions
+    for i, label in enumerate(all_labels):
+        top3_preds = np.argsort(all_probs[i])[-3:]
         if label in top3_preds:
             top3_correct += 1
-    report['top3_accuracy'] = top3_correct / len(all_labels_array)
+    report['top3_accuracy'] = float(top3_correct / len(all_labels))
     
-    # 3. Per-class confidence (average confidence when predicting each class)
+    # 3. Per-class confidence (dict of Python floats)
     class_confidences = {}
     for i, class_name in enumerate(class_names):
-        class_mask = all_preds_array == i
+        class_mask = all_preds == i
         if class_mask.sum() > 0:
-            # Average max probability when predicting this class
             class_confidences[class_name] = float(all_probs[class_mask, i].mean())
         else:
             class_confidences[class_name] = 0.0
     report['class_confidences'] = class_confidences
     
-    # 4. Macro-averaged precision, recall, f1 (already in classification_report but extract for clarity)
-    report['macro_precision'] = precision_score(all_labels_array, all_preds_array, average='macro', zero_division=0)
-    report['macro_recall'] = recall_score(all_labels_array, all_preds_array, average='macro', zero_division=0)
-    report['macro_f1'] = f1_score(all_labels_array, all_preds_array, average='macro', zero_division=0)
+    # 4. Ensure macro/weighted metrics are present (sklearn returns np.float64)
+    # These should already be in classification_report, but we'll add explicit ones too
+    report['macro_precision'] = float(precision_score(all_labels, all_preds, average='macro', zero_division=0))
+    report['macro_recall'] = float(recall_score(all_labels, all_preds, average='macro', zero_division=0))
+    report['macro_f1'] = float(f1_score(all_labels, all_preds, average='macro', zero_division=0))
+    
+    # Verify required keys exist
+    assert 'macro avg' in report, "macro avg missing from classification_report"
+    assert 'weighted avg' in report, "weighted avg missing from classification_report"
+    assert 'accuracy' in report, "accuracy missing from classification_report"
     
     print(f"Train Loss: {epoch_loss:.4f}, Train Acc: {epoch_acc:.4f}, Top-3 Acc: {report['top3_accuracy']:.4f}, Log Loss: {report['log_loss']:.4f}")
     return epoch_loss, epoch_acc, report
@@ -318,12 +384,14 @@ def validate_epoch(model, dataloader, criterion, device, class_names):
     all_preds = []
     all_labels = []
     all_probs = []  # For storing prediction probabilities
+    all_ids =[]
 
     pbar = tqdm(dataloader, desc="Validating")
     with torch.no_grad():
 
-        for images, labels in pbar:
+        for images, labels, ids in pbar:
             images, labels = images.to(device), labels.to(device)
+            # ids are strings, don't move to device
 
             # Forward pass
             outputs = model(images)
@@ -331,58 +399,81 @@ def validate_epoch(model, dataloader, criterion, device, class_names):
             
             # Get probabilities for additional metrics
             probs = torch.softmax(outputs, dim=1)
-            all_probs.extend(probs.cpu().numpy())
+            all_probs.extend(probs.detach().cpu().numpy().tolist())
             
             # Statistics
             running_loss += loss.item() * images.size(0)
             _, predicted = torch.max(outputs, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-
-            all_preds.extend(predicted.cpu().numpy())
-            all_labels.extend(labels.cpu().numpy())
+            all_ids.extend(ids)  # ids are already strings, not tensors
+            all_preds.extend(predicted.detach().cpu().numpy().tolist())
+            all_labels.extend(labels.detach().cpu().numpy().tolist())
 
             pbar.set_postfix(loss=f"{loss.item():.4f}", acc=f"{correct / total:.4f}")
-    
-    # Convert to numpy arrays
+
+    # Convert to numpy arrays for easier manipulation
     all_probs = np.array(all_probs)
-    all_labels_array = np.array(all_labels)
-    all_preds_array = np.array(all_preds)
+    all_labels = np.array(all_labels)
+    all_preds = np.array(all_preds)
+    # all_ids stays as list (strings)
     
-    # Basic metrics
-    report = classification_report(all_labels_array, all_preds_array, target_names=class_names, output_dict=True)
-    report['confusion_matrix'] = confusion_matrix(all_labels_array, all_preds_array).tolist()
-    report['loss'] = running_loss / total
-    report['acc'] = correct / total
-    epoch_acc = correct / total
+    
+    
+    misclassified_images = pd.DataFrame(columns=["id", "true_label", "predicted_label", "probability"])
+    for i, id in enumerate(all_ids):
+        if all_preds[i] != all_labels[i]:
+            misclassified_images.loc[len(misclassified_images)] = {
+                "id": id,
+                "true_label": class_names[all_labels[i]],
+                "predicted_label": class_names[all_preds[i]],
+                "probability": all_probs[i][all_preds[i]]
+            }
+    
+    # Basic metrics - classification_report returns dict with macro avg, weighted avg, accuracy
+    report = classification_report(all_labels, all_preds, target_names=class_names, output_dict=True, zero_division=0)
+    
+    # Confusion matrix as list (not numpy array)
+    report['confusion_matrix'] = confusion_matrix(all_labels, all_preds).tolist()
+    
+    # Scalar metrics (already Python types)
+    report['loss'] = float(running_loss / total)
+    report['acc'] = float(correct / total)
+    report['ids'] = all_ids  # List of strings (will be removed in save())
+    epoch_acc = float(correct / total)
+    report['misclassified_images'] = misclassified_images  # DataFrame (will be converted in save())
     
     # Additional valuable metrics
-    # 1. Log Loss (measures prediction confidence quality)
-    report['log_loss'] = log_loss(all_labels_array, all_probs)
+    # 1. Log Loss (returns numpy.float64, ensure it's Python float)
+    report['log_loss'] = float(log_loss(all_labels, all_probs))
     
-    # 2. Top-3 Accuracy (useful for multi-class: is correct class in top 3 predictions?)
+    # 2. Top-3 Accuracy (Python float)
     top3_correct = 0
-    for i, label in enumerate(all_labels_array):
-        top3_preds = np.argsort(all_probs[i])[-3:]  # Get indices of top 3 predictions
+    for i, label in enumerate(all_labels):
+        top3_preds = np.argsort(all_probs[i])[-3:]
         if label in top3_preds:
             top3_correct += 1
-    report['top3_accuracy'] = top3_correct / len(all_labels_array)
+    report['top3_accuracy'] = float(top3_correct / len(all_labels))
     
-    # 3. Per-class confidence (average confidence when predicting each class)
+    # 3. Per-class confidence (dict of Python floats)
     class_confidences = {}
     for i, class_name in enumerate(class_names):
-        class_mask = all_preds_array == i
+        class_mask = all_preds == i
         if class_mask.sum() > 0:
-            # Average max probability when predicting this class
             class_confidences[class_name] = float(all_probs[class_mask, i].mean())
         else:
             class_confidences[class_name] = 0.0
     report['class_confidences'] = class_confidences
     
-    # 4. Macro-averaged precision, recall, f1 (already in classification_report but extract for clarity)
-    report['macro_precision'] = precision_score(all_labels_array, all_preds_array, average='macro', zero_division=0)
-    report['macro_recall'] = recall_score(all_labels_array, all_preds_array, average='macro', zero_division=0)
-    report['macro_f1'] = f1_score(all_labels_array, all_preds_array, average='macro', zero_division=0)
+    # 4. Ensure macro/weighted metrics are present (sklearn returns np.float64)
+    report['macro_precision'] = float(precision_score(all_labels, all_preds, average='macro', zero_division=0))
+    report['macro_recall'] = float(recall_score(all_labels, all_preds, average='macro', zero_division=0))
+    report['macro_f1'] = float(f1_score(all_labels, all_preds, average='macro', zero_division=0))
+    
+    # Verify required keys exist
+    assert 'macro avg' in report, "macro avg missing from classification_report"
+    assert 'weighted avg' in report, "weighted avg missing from classification_report"
+    assert 'accuracy' in report, "accuracy missing from classification_report"
     
     print(f"Validation Loss: {report['loss']:.4f}, Validation Acc: {report['acc']:.4f}, Top-3 Acc: {report['top3_accuracy']:.4f}, Log Loss: {report['log_loss']:.4f}")
     return epoch_acc, report
@@ -391,11 +482,12 @@ class TrainingLogger:
     """Professional logging for SageMaker training"""
     
     def __init__(self, output_dir=None, name="metrics", class_names=None):
-        self.output_dir = output_dir or os.environ.get('SM_OUTPUT_DATA_DIR', '/opt/ml/output/data')
-        os.makedirs(self.output_dir, exist_ok=True)
+        self.output_dir = output_dir # or os.environ.get('SM_OUTPUT_DATA_DIR', '/opt/ml/output/data')
+        # os.makedirs(self.output_dir, exist_ok=True)
         self.history = []
         self.class_names = class_names
         self.name = name
+        
     
     def log_report(self, report):
         """Log report for one epoch"""
@@ -436,25 +528,45 @@ class TrainingLogger:
                 f1 = report.get('class_f1s', {}).get(class_name, 0)
                 conf = report.get('class_confidences', {}).get(class_name, 0)
                 print(f"    {class_name:20s}: F1={f1:.4f}, Confidence={conf:.4f}")
-        print()
-        
     
-    def save(self):
-        """Save complete history"""
+    def save(self, epoche):
+        """Save complete history to JSON with proper handling of numpy types"""
         
-        # Save as JSON (complete data)
-        json_path = os.path.join(self.output_dir, f'{self.name}_metrics.json')
+        print(f"Saving metrics to {self.output_dir}")
+        
+        # Custom JSON encoder to handle numpy types
+
+        
+        # Clean up history for JSON serialization
+        clean_history = []
+        for report in self.history:
+            clean_report = copy.deepcopy(report)
+            
+            # Remove or convert non-JSON-serializable items
+            if 'ids' in clean_report:
+                # Remove ids from JSON (too large, not useful for analysis)
+                del clean_report['ids']
+            
+            if 'misclassified_images' in clean_report:
+                # Convert DataFrame to dict for JSON
+                if hasattr(clean_report['misclassified_images'], 'to_dict'):
+                    clean_report['misclassified_images'] = clean_report['misclassified_images'].to_dict('records')
+            
+            # Ensure micro avg, macro avg, weighted avg are present
+            # (classification_report should include these automatically)
+            
+            clean_history.append(clean_report)
+        
+        # Save as JSON only (not CSV)
+        json_path = os.path.join(self.output_dir, f'{self.name}_metrics_{epoche}.json')
         with open(json_path, 'w') as f:
-            json.dump(self.history, f, indent=2)
-        
-        # Save as CSV (easy viewing)
-        csv_path = os.path.join(self.output_dir, f'{self.name}_metrics.csv')
-        df = pd.DataFrame(self.history)
-        df.to_csv(csv_path, index=False)
+            json.dump(clean_history, f, indent=2, cls=NumpyEncoder)
         
         print(f"✓ Metrics saved to {self.output_dir}")
         print(f"  - {json_path}")
-        print(f"  - {csv_path}")
+        print(f"  Total epochs logged: {len(clean_history)}")
+
+        
 
 
 if __name__ == "__main__":
@@ -472,7 +584,7 @@ if __name__ == "__main__":
     # parser.add_argument("--image-size", type=int, default=224)
     # parser.add_argument("--stochastic-depth", type=float, default=0.1)
     parser = argparse.ArgumentParser(
-        description='Train ResNet18 for Animal Classification (Local & SageMaker)',
+        description='Train model for Animal Classification (Local & SageMaker)',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     
@@ -518,7 +630,7 @@ if __name__ == "__main__":
                         help="Directory to save metrics and logs")
     
     # Model saving
-    parser.add_argument("--save-file", type=str, default="final_resnet18_model.pth",
+    parser.add_argument("--save-file", type=str, default="final_swin-b_model.pth",
                         help="Filename for final saved model")
     
     args = parser.parse_args()
@@ -528,6 +640,9 @@ if __name__ == "__main__":
     
     # Detect running environment
     is_sagemaker = os.environ.get("SM_MODEL_DIR") is not None
+    
+    print(f"SM_MODEL_DIR: {os.environ.get('SM_MODEL_DIR')}")
+    print(f"SM_OUTPUT_DATA_DIR: {os.environ.get('SM_OUTPUT_DATA_DIR')}")
     
     # Create directories if they don't exist (for local training)
     if not is_sagemaker:
@@ -580,6 +695,7 @@ if __name__ == "__main__":
         gpu_alloc, gpu_reserved = get_gpu_memory()
         print(f"Initial GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB")
     
+    
 
     
     train_transform = transforms.Compose(
@@ -587,6 +703,7 @@ if __name__ == "__main__":
             transforms.Resize((img_size, img_size)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            # transforms.RandomErasing(),
         ]
     )
     
@@ -595,6 +712,7 @@ if __name__ == "__main__":
             transforms.Resize((img_size, img_size)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            # transforms.RandomErasing(),
         ]
     )
     
@@ -647,8 +765,8 @@ if __name__ == "__main__":
     )
    
     
-    train_dataset = AnimalDataset(train_df, transform=train_transform, folder=train_folder, img_size=img_size)
-    val_dataset = AnimalDataset(val_df, transform=val_transform, folder=train_folder, img_size=img_size)
+    train_dataset = AnimalDatasetSwin(train_df, transform=train_transform, folder=train_folder, img_size=img_size)
+    val_dataset = AnimalDatasetSwin(val_df, transform=val_transform, folder=train_folder, img_size=img_size)
 
     print(f"After creating datasets RAM usage: {get_ram_usage():.2f} MB")
     if torch.cuda.is_available():
@@ -669,9 +787,14 @@ if __name__ == "__main__":
     
     # Load model
     # model = models.swin_t(weights=None)
-    model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
-    num_features = model.fc.in_features
-    model.fc = nn.Linear(num_features, num_classes)
+    
+    # ResNet18 Model
+    # model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+    # model.fc = nn.Linear(model.fc.in_features, num_classes)
+    print("SwinB Model")
+    model = swin_b(weights=Swin_B_Weights.IMAGENET1K_V1)
+    model.head = nn.Linear(model.head.in_features, num_classes)
+    
     # print("Initializing Swin Transformer architecture...")
     # model = models.swin_t(weights=None) 
     
@@ -736,7 +859,7 @@ if __name__ == "__main__":
     model = model.to(device)
     
    
-    print(f"Model fc: {model.fc}")
+    print(f"Model head: {model.head}")
     print()
     print(f"After moving model to GPU RAM usage: {get_ram_usage():.2f} MB")
     if torch.cuda.is_available():
@@ -746,11 +869,13 @@ if __name__ == "__main__":
     # Mixup configuration (currently disabled)
     mixup_enabled = False
     
-    optimizer = optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
+    optimizer = optim.AdamW(model.parameters(), lr=args.learning_rate) # weight_decay=args.weight_decay 
     print(f"Optimizer: {optimizer}")
     criterion = nn.CrossEntropyLoss()
     print(f"Criterion: {criterion}")
     print(f"Total Epochs: {args.epochs}")
+    scheduler = CosineAnnealingLR(optimizer, T_max=args.epochs)
+    print(f"Scheduler: {scheduler}")
     
     model.train()
     best_val_acc = 0.0
@@ -758,8 +883,8 @@ if __name__ == "__main__":
 
     # scaler = GradScaler()
     
-    train_logger = TrainingLogger(output_dir=args.output_dir, class_names=class_names, name="train")
-    val_logger = TrainingLogger(output_dir=args.output_dir, class_names=class_names, name="val")
+    train_logger = TrainingLogger(output_dir=args.model_dir,  class_names=class_names, name="train")
+    val_logger = TrainingLogger(output_dir=args.model_dir, class_names=class_names, name="val")
     
     for epoch in range(args.epochs):
         print(f"Epoch {epoch+1}/{args.epochs}")
@@ -782,30 +907,51 @@ if __name__ == "__main__":
         val_logger.log_report(val_report)
         val_logger.print_log(val_report)  # Already called inside log_report
         
+        lr_before = scheduler.get_last_lr()[0]
+
+        # Step the scheduler
+        scheduler.step()
+
+        # After step
+        lr_after = scheduler.get_last_lr()[0]
+        
+        print(f"Learning Rate: {lr_before:.6f} → {lr_after:.6f}")
+        
         if torch.cuda.is_available():
             gpu_alloc, gpu_reserved = get_gpu_memory()
             print(f"After validation GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB")
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            best_file_name = args.save_file.split(".")[0] + "_best.pth"
+            best_file_name = args.save_file.split(".")[0] + f"_{epoch}_best.pth"
             print(f"Saving best model to {best_file_name} with val acc {val_acc:.4f}")
             save_path = os.path.join(args.model_dir, best_file_name)
             torch.save(model.state_dict(), save_path)
             print(f"✓ Best model saved! (Val Acc: {val_acc:.4f}), path: {save_path}")
+            train_logger.save(epoch)
+            val_logger.save(epoch)
 
 
-    '''
-    Load test data from pickle and run predictions
-    '''
-    print("\n" + "=" * 60)
-    print("RUNNING TEST PREDICTIONS")
-    print("=" * 60)
+    train_logger.save(args.epochs+100)
+    val_logger.save(args.epochs+100)
+
+    dict_scheduler = scheduler.state_dict()
+    print(f"Scheduler state dict: {dict_scheduler}")
     
-
+    json_path = os.path.join(args.model_dir, f'scheduler_metrics.json')
+    with open(json_path, 'w') as f:
+        json.dump(dict_scheduler, f, indent=2)
         
-    train_logger.save()
-    val_logger.save()
+    # # Save as CSV (easy viewing)
+    # csv_path = os.path.join(args.model_dir, f'scheduler_metrics.csv')
+    # df = pd.DataFrame(dict_scheduler)
+    # df.to_csv(csv_path, index=False)
+    
+    # print(f"✓ Metrics saved to {args.model_dir}")
+    # print(f"  - {json_path}")
+    # print(f"  - {csv_path}")
+        
+    
     print("Saving final model with this name: ", args.save_file)
     save_path = os.path.join(args.model_dir, args.save_file)
     torch.save(model.state_dict(), save_path)

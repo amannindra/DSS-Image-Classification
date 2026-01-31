@@ -2,3 +2,7 @@
 data.zip
 /comp
 .venv/
+*.pth
+*.tar.gz
+*.gz
+.DS_Store

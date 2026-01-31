@@ -3,7 +3,7 @@
 
 ### Is the model still improving or has it plateaued?
 
-Based on the graph the model has plateaued at 4 epoches.The validation stopped around 87% accuracy.
+Based on the graph the model has plateaued at 4 epoches. The validation stopped around 87% accuracy.
 
 I need to deeper model.
 
@@ -12,7 +12,6 @@ I need to deeper model.
 After 4 epoches there is a significant gap between train and val accuracy curves and loss. 
 
 I need to add regularization.
-
 
 Large gap → Overfitting (need regularization: dropout, weight decay, data augmentation)
 Small gap → Good generalization (can potentially reduce regularization)
@@ -60,7 +59,6 @@ No, the number of blank images are relativly high from the eight choices. Also p
 Yes → Class imbalance problem → Use weighted loss, oversampling, or focal loss
 No → Visual similarity problem → Need better features or data augmentation
 
-
 🎭 3. Confusion Matrix Questions
 
 ### What are the top 3 most confused class pairs?
@@ -99,8 +97,6 @@ THe confusion matrix decreased for blank, but for all others it has increased. H
 ### Are there classes with high confidence but low F1?
 
 No there isn't any class with high confidence and low f1
-
-
 
 📊 5. Class Imbalance Impact Questions
 
@@ -173,5 +169,80 @@ Yes, after 2 epoches, the gap between train and validation grows. At 4 epcoehs t
 
 ### Do confusions suggest the model needs more spatial awareness?
 
+idk how to check that
+
+🚀 9. Data Quality Questions
+
+### Are the most confused classes actually visually similar?
+
+Yes, when analyzing the antelope duiker images and blank images, you can see that alot the images is visualy similar, especially since the antelope duiker data isn't as good. Majority of the duikers are far away from the camera and blurred into the background of the tree.
 
 
+### Do poorly performing classes have consistent confusion patterns?
+
+The rodent class images are poor, even as a human I can barly see rodent
+
+### Are blank images confused with actual animals?
+
+Yes, based on my analysis, around 15% of misclassified Blank images are in antelope, 7% in rodent, monkey_prosimian is 3%, and leopord is 4%, etc
+
+🔴 Top 10 Misclassifications:
+            True        Predicted  Count  Pct_of_True
+           blank  antelope_duiker     86    15.551537
+ antelope_duiker            blank     74    11.954766
+           blank           rodent     42     7.594937
+           blank monkey_prosimian     33     5.967450
+ antelope_duiker monkey_prosimian     32     5.169628
+           blank          leopard     22     3.978300
+monkey_prosimian  antelope_duiker     22     3.531300
+monkey_prosimian            blank     19     3.049759
+           blank      civet_genet     17     3.074141
+          rodent            blank     16     3.180915
+           blank             bird     12     2.169982
+ antelope_duiker             bird     10     1.615509
+ antelope_duiker      civet_genet     10     1.615509
+     civet_genet           rodent      8     1.320132
+ antelope_duiker           rodent      8     1.292407
+            bird            blank      7     1.707317
+         leopard            blank      7     1.241135
+ antelope_duiker              hog      6     0.969305
+     civet_genet            blank      5     0.825083
+monkey_prosimian             bird      5     0.802568
+            bird  antelope_duiker      4     0.975610
+          rodent      civet_genet      4     0.795229
+...
+             hog           rodent      0     0.000000
+             hog monkey_prosimian      0     0.000000
+             hog      civet_genet      0     0.000000
+           blank              hog      0     0.000000
+
+
+Deployment Decision Questions
+
+
+### What's your target accuracy for deployment?
+
+95%+ 
+
+### Which misclassifications are most costly in production?
+ 
+blank -> antelope_duiker
+
+🎯 Start with these 5 critical questions:
+
+### Is there overfitting? 
+
+Yes there is overfitting after 4 epochs
+
+(Train-val gap) → Determines if you need regularization
+
+Which 2-3 classes perform worst? → Focus your improvement efforts
+
+The 3 classes that performed the worst is blanks, antelope_duiker and monkey_promian.
+
+
+What are the top 3 confusions? → Shows where the model struggles
+
+Does class size correlate with F1? → Tells you if imbalance is the main issue
+
+Are you using the best epoch? → Might get free performance gain
