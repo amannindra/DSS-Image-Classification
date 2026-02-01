@@ -6,3 +6,15 @@ data.zip
 *.tar.gz
 *.gz
 .DS_Store
+*.jpg
+*.png
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.webp
+*.svg
+*.eps
+*.pdf
+*.docx

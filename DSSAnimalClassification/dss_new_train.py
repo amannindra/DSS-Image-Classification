@@ -140,13 +140,14 @@ def get_gpu_memory():
     return 0, 0
 
 
+
 class AnimalDatasetSwin(Dataset):
     def __init__(self, dataframe, transform=None, folder="", img_size=224):
         self.dataframe = dataframe.reset_index(drop=True)
         self.transform = transform
         self.img_size = img_size
         self.folder = folder
-        label_columns = [
+        self.label_columns = [
             "antelope_duiker",
             "bird",
             "blank",
@@ -156,7 +157,89 @@ class AnimalDatasetSwin(Dataset):
             "monkey_prosimian",
             "rodent",
         ]
-        self.labels = dataframe[label_columns].values.argmax(axis=1)
+        IMAGENET_MEAN = [0.485, 0.456, 0.406]
+        IMAGENET_STD = [0.229, 0.224, 0.225]
+      
+        
+          # train_transform = transforms.Compose(
+    #     [
+    #         transforms.RandomRotation(degrees=(0, 30), fill=128),
+    #         transforms.Resize((img_size, img_size)),
+    #         transforms.RandomHorizontalFlip(p=0.4),
+    #         transforms.ColorJitter(brightness=(0.7, 1.2), contrast=(0.7, 1.2), saturation=(0.7, 1.2)),
+    #         transforms.ToTensor(),
+    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    #         # transforms.RandomErasing(),
+    #     ]
+    # )
+        antelope_transform = transforms.Compose([
+          transforms.Resize((img_size, img_size)),
+          transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD)
+        ])
+        bird_transform = transforms.Compose([
+        transforms.Resize((img_size, img_size)),
+        transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        blank_transform = transforms.Compose([
+            transforms.RandomRotation(degrees=(0, 30), fill=128),
+            transforms.Resize((img_size, img_size)),
+            transforms.RandomHorizontalFlip(p=0.4),
+            transforms.ColorJitter(brightness=(0.7, 1.2), contrast=(0.7, 1.2), saturation=(0.7, 1.2)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ])
+        civet_genet_transform = transforms.Compose([
+                transforms.Resize((img_size, img_size)),
+                transforms.RandomHorizontalFlip(p=0.5),
+                transforms.ToTensor(),
+                transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        hog_transform = transforms.Compose([
+            transforms.Resize((img_size, img_size)),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        leopard_transform = transforms.Compose([
+            transforms.RandomRotation(degrees=(0, 30), fill=128),
+            transforms.Resize((img_size, img_size)),
+            transforms.RandomHorizontalFlip(p=0.4),
+            transforms.ColorJitter(brightness=(0.7, 1.2), contrast=(0.7, 1.2), saturation=(0.7, 1.2)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+        
+        monkey_transform = transforms.Compose([
+            transforms.Resize((img_size, img_size)),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+
+        rodent_transform = transforms.Compose([
+            transforms.Resize((img_size, img_size)),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+
+        
+        self.class_transforms = {
+            "blank": blank_transform,
+            "antelope_duiker": antelope_transform,
+            "rodent": rodent_transform,
+            "monkey_prosimian": monkey_transform,
+            "bird": bird_transform,
+            "hog": hog_transform,
+            "leopard": leopard_transform,
+            "civet_genet": civet_genet_transform,
+        }
+        self.labels = dataframe[self.label_columns].values.argmax(axis=1)
     def __len__(self):
         return len(self.dataframe)
     def __getitem__(self, idx):
@@ -170,16 +253,20 @@ class AnimalDatasetSwin(Dataset):
         except Exception as e:
             print(f"Error loading {image_path}: {e}")
             image = Image.new('RGB', (self.img_size, self.img_size), color=(128, 128, 128))
+     
         if self.transform:
             image = self.transform(image)
+        else:
+            transform = self.class_transforms[self.label_columns[self.labels[idx]]]
+            image = transform(image)
         return image, self.labels[idx], self.dataframe.iloc[idx]["id"]
     def get_y(self):
         return self.labels
-    def show_image(self, idx):
-        image = self.dataframe.iloc[idx]["image"]
-        plt.imshow(image)
-        plt.axis("off")
-        plt.show()
+    # def show_image(self, idx):
+    #     image = self.dataframe.iloc[idx]["image"]
+    #     plt.imshow(image)
+    #     plt.axis("off")
+    #     plt.show()
 
 # class AnimalDataset(Dataset):
 #     def __init__(self, dataframe, transform=None, folder="", img_size=224):
@@ -247,14 +334,14 @@ class AnimalDatasetSwin(Dataset):
 #             image = self.transform(image)
 #         return image
 class NumpyEncoder(json.JSONEncoder):
-    def default_encoder(self, obj):
+    def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
         if isinstance(obj, np.floating):
             return float(obj)
         if isinstance(obj, np.ndarray):
             return obj.tolist()
-        return super(NumpyEncoder, self).default_encoder(obj)
+        return super().default(obj)
 
 def train_epoch(model, dataloader, criterion, optimizer, device, class_names, num_classes=8):
     model.train()
@@ -280,26 +367,6 @@ def train_epoch(model, dataloader, criterion, optimizer, device, class_names, nu
         # 1. Cast forward pass to float16 (Auto Mixed Precision)
         outputs = model(images)
         loss = criterion(outputs, labels)
-
-        # with autocast():
-        #     outputs = model(images)
-        #     loss = criterion(outputs, labels)
-
-        # # 2. Scale loss and backward pass
-        # if scaler is not None:
-        #     scaler.scale(loss).backward()
-        # else:
-        #     loss.backward()
-        
-        # # 3. Step optimizer using scaler
-        # if scaler is not None:
-        #     scaler.step(optimizer)
-        # else:
-        #     optimizer.step()
-        # if scaler is not None:
-        #     scaler.update()
-
-        # Statistics (keep existing logic)
         loss.backward()
         optimizer.step()
         
@@ -327,6 +394,18 @@ def train_epoch(model, dataloader, criterion, optimizer, device, class_names, nu
     all_preds = np.array(all_preds)
     # all_ids stays as list (strings)
     
+    
+    
+    misclassified_images = pd.DataFrame(columns=["id", "true_label", "predicted_label", "probability"])
+    for i, id in enumerate(all_ids):
+        if all_preds[i] != all_labels[i]:
+            misclassified_images.loc[len(misclassified_images)] = {
+                "id": id,
+                "true_label": class_names[all_labels[i]],
+                "predicted_label": class_names[all_preds[i]],
+                "probability": all_probs[i][all_preds[i]]
+            }
+    
     # Basic metrics - classification_report returns dict with macro avg, weighted avg, accuracy
     report = classification_report(all_labels, all_preds, target_names=class_names, output_dict=True, zero_division=0)
     
@@ -337,8 +416,8 @@ def train_epoch(model, dataloader, criterion, optimizer, device, class_names, nu
     report['loss'] = float(running_loss / total)
     report['acc'] = float(correct / total)
     report['ids'] = all_ids  # List of strings (will be removed in save())
-    epoch_loss = running_loss / total
-    epoch_acc = float(accuracy_score(all_labels, all_preds))
+    epoch_acc = float(correct / total)
+    report['misclassified_images'] = misclassified_images  # DataFrame (will be converted in save())
     
     # Additional valuable metrics
     # 1. Log Loss (returns numpy.float64, ensure it's Python float)
@@ -363,18 +442,31 @@ def train_epoch(model, dataloader, criterion, optimizer, device, class_names, nu
     report['class_confidences'] = class_confidences
     
     # 4. Ensure macro/weighted metrics are present (sklearn returns np.float64)
-    # These should already be in classification_report, but we'll add explicit ones too
     report['macro_precision'] = float(precision_score(all_labels, all_preds, average='macro', zero_division=0))
     report['macro_recall'] = float(recall_score(all_labels, all_preds, average='macro', zero_division=0))
     report['macro_f1'] = float(f1_score(all_labels, all_preds, average='macro', zero_division=0))
+    
+    report['micro_precision'] = float(precision_score(all_labels, all_preds, average='micro', zero_division=0))
+    report['micro_recall'] = float(recall_score(all_labels, all_preds, average='micro', zero_division=0))
+    report['micro_f1'] = float(f1_score(all_labels, all_preds, average='micro', zero_division=0))
+    
+    report['weighted_precision'] = float(precision_score(all_labels, all_preds, average='weighted', zero_division=0))
+    report['weighted_recall'] = float(recall_score(all_labels, all_preds, average='weighted', zero_division=0))
+    report['weighted_f1'] = float(f1_score(all_labels, all_preds, average='weighted', zero_division=0))
     
     # Verify required keys exist
     assert 'macro avg' in report, "macro avg missing from classification_report"
     assert 'weighted avg' in report, "weighted avg missing from classification_report"
     assert 'accuracy' in report, "accuracy missing from classification_report"
+    assert 'micro_precision' in report, "micro_precision missing from classification_report"
+    assert 'micro_recall' in report, "micro_recall missing from classification_report"
+    assert 'micro_f1' in report, "micro_f1 missing from classification_report"
+    assert 'weighted_precision' in report, "weighted_precision missing from classification_report"
+    assert 'weighted_recall' in report, "weighted_recall missing from classification_report"
+    assert 'weighted_f1' in report, "weighted_f1 missing from classification_report"
     
-    print(f"Train Loss: {epoch_loss:.4f}, Train Acc: {epoch_acc:.4f}, Top-3 Acc: {report['top3_accuracy']:.4f}, Log Loss: {report['log_loss']:.4f}")
-    return epoch_loss, epoch_acc, report
+    print(f"Train Acc: {report['acc']:.4f}, Top-3 Acc: {report['top3_accuracy']:.4f}, Log Loss: {report['log_loss']:.4f}")
+    return epoch_acc, report
 
 def validate_epoch(model, dataloader, criterion, device, class_names):
     model.eval()
@@ -470,13 +562,29 @@ def validate_epoch(model, dataloader, criterion, device, class_names):
     report['macro_recall'] = float(recall_score(all_labels, all_preds, average='macro', zero_division=0))
     report['macro_f1'] = float(f1_score(all_labels, all_preds, average='macro', zero_division=0))
     
+    report['micro_precision'] = float(precision_score(all_labels, all_preds, average='micro', zero_division=0))
+    report['micro_recall'] = float(recall_score(all_labels, all_preds, average='micro', zero_division=0))
+    report['micro_f1'] = float(f1_score(all_labels, all_preds, average='micro', zero_division=0))
+    
+    report['weighted_precision'] = float(precision_score(all_labels, all_preds, average='weighted', zero_division=0))
+    report['weighted_recall'] = float(recall_score(all_labels, all_preds, average='weighted', zero_division=0))
+    report['weighted_f1'] = float(f1_score(all_labels, all_preds, average='weighted', zero_division=0))
+    
     # Verify required keys exist
     assert 'macro avg' in report, "macro avg missing from classification_report"
     assert 'weighted avg' in report, "weighted avg missing from classification_report"
     assert 'accuracy' in report, "accuracy missing from classification_report"
+    assert 'micro_precision' in report, "micro_precision missing from classification_report"
+    assert 'micro_recall' in report, "micro_recall missing from classification_report"
+    assert 'micro_f1' in report, "micro_f1 missing from classification_report"
+    assert 'weighted_precision' in report, "weighted_precision missing from classification_report"
+    assert 'weighted_recall' in report, "weighted_recall missing from classification_report"
+    assert 'weighted_f1' in report, "weighted_f1 missing from classification_report"
     
     print(f"Validation Loss: {report['loss']:.4f}, Validation Acc: {report['acc']:.4f}, Top-3 Acc: {report['top3_accuracy']:.4f}, Log Loss: {report['log_loss']:.4f}")
     return epoch_acc, report
+
+
 
 class TrainingLogger:
     """Professional logging for SageMaker training"""
@@ -698,6 +806,17 @@ if __name__ == "__main__":
     
 
     
+    # train_transform = transforms.Compose(
+    #     [
+    #         transforms.RandomRotation(degrees=(0, 30), fill=128),
+    #         transforms.Resize((img_size, img_size)),
+    #         transforms.RandomHorizontalFlip(p=0.4),
+    #         transforms.ColorJitter(brightness=(0.7, 1.2), contrast=(0.7, 1.2), saturation=(0.7, 1.2)),
+    #         transforms.ToTensor(),
+    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    #         # transforms.RandomErasing(),
+    #     ]
+    # )
     train_transform = transforms.Compose(
         [
             transforms.Resize((img_size, img_size)),
@@ -706,7 +825,6 @@ if __name__ == "__main__":
             # transforms.RandomErasing(),
         ]
     )
-    
     val_transform = transforms.Compose(
         [
             transforms.Resize((img_size, img_size)),
@@ -716,8 +834,9 @@ if __name__ == "__main__":
         ]
     )
     
+
     
-    print(f"Train transform: {train_transform}")
+    # print(f"Train transform: {train_transform}")
     print(f"Val transform: {val_transform}")
     
     base_path = args.data_dir
@@ -738,7 +857,9 @@ if __name__ == "__main__":
         print(f"Warning: Test features CSV not found: {test_features_csv}")
 
     dataframe = pd.read_csv(train_labels_csv)
-    print(f"Dataframe: {dataframe.head()}")
+    dataframe_test = pd.read_csv(test_features_csv)
+    print(f"Dataframe train: {dataframe.head()}")
+    # print(f"Dataframe test: {dataframe_test.head()}")
     
     # Validate dataframe is not empty
     if len(dataframe) == 0:
@@ -893,7 +1014,7 @@ if __name__ == "__main__":
             gpu_alloc, gpu_reserved = get_gpu_memory()
             print(f"Start of epoch GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB")
         
-        train_loss, train_acc, train_report = train_epoch(model, train_loader, criterion, optimizer, device, num_classes=num_classes, class_names = class_names)
+        train_acc, train_report = train_epoch(model, train_loader, criterion, optimizer, device, num_classes=num_classes, class_names = class_names)
         train_report['epoch'] = epoch
         train_logger.log_report(train_report)
         train_logger.print_log(train_report)  # Already called inside log_report
@@ -904,16 +1025,14 @@ if __name__ == "__main__":
         
         val_acc, val_report = validate_epoch(model, val_loader, criterion, device, class_names = class_names)
         val_report['epoch'] = epoch
+        lr_before = scheduler.get_last_lr()[0]
+        scheduler.step()
+        lr_after = scheduler.get_last_lr()[0]
+        val_report['lr_before'] = lr_before
+        val_report['lr_after'] = lr_after
         val_logger.log_report(val_report)
         val_logger.print_log(val_report)  # Already called inside log_report
-        
-        lr_before = scheduler.get_last_lr()[0]
-
-        # Step the scheduler
-        scheduler.step()
-
-        # After step
-        lr_after = scheduler.get_last_lr()[0]
+    
         
         print(f"Learning Rate: {lr_before:.6f} → {lr_after:.6f}")
         
@@ -935,24 +1054,17 @@ if __name__ == "__main__":
     train_logger.save(args.epochs+100)
     val_logger.save(args.epochs+100)
 
-    dict_scheduler = scheduler.state_dict()
-    print(f"Scheduler state dict: {dict_scheduler}")
+    # dict_scheduler = scheduler.state_dict()
+    # print(f"Scheduler state dict: {dict_scheduler}")
     
-    json_path = os.path.join(args.model_dir, f'scheduler_metrics.json')
-    with open(json_path, 'w') as f:
-        json.dump(dict_scheduler, f, indent=2)
-        
-    # # Save as CSV (easy viewing)
-    # csv_path = os.path.join(args.model_dir, f'scheduler_metrics.csv')
-    # df = pd.DataFrame(dict_scheduler)
-    # df.to_csv(csv_path, index=False)
-    
-    # print(f"✓ Metrics saved to {args.model_dir}")
-    # print(f"  - {json_path}")
-    # print(f"  - {csv_path}")
-        
+    # json_path = os.path.join(args.model_dir, f'scheduler_metrics.json')
+    # with open(json_path, 'w') as f:
+    #     json.dump(dict_scheduler, f, indent=2)  
     
     print("Saving final model with this name: ", args.save_file)
     save_path = os.path.join(args.model_dir, args.save_file)
     torch.save(model.state_dict(), save_path)
     print(f"Model saved to {save_path}")
+    
+    
+    

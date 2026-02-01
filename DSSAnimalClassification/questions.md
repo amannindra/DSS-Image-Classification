@@ -246,3 +246,309 @@ What are the top 3 confusions? → Shows where the model struggles
 Does class size correlate with F1? → Tells you if imbalance is the main issue
 
 Are you using the best epoch? → Might get free performance gain
+
+
+# New Analysis
+
+Does random rotation help blank images?
+
+Not really, I suppose
+
+
+Swin Test 1
+    # train_transform = transforms.Compose(
+    #     [
+    #         transforms.RandomRotation(degrees=(0, 30), fill=128),
+    #         transforms.Resize((img_size, img_size)),
+    #         transforms.RandomHorizontalFlip(p=0.4),
+    #         transforms.ColorJitter(brightness=(0.7, 1.2), contrast=(0.7, 1.2), saturation=(0.7, 1.2)),
+    #         transforms.ToTensor(),
+    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    #         # transforms.RandomErasing(),
+    #     ]
+    # )
+
+
+Swin Test 2:
+
+
+class AnimalDatasetSwin(Dataset):
+    def __init__(self, dataframe, transform=None, folder="", img_size=224):
+        self.dataframe = dataframe.reset_index(drop=True)
+        self.transform = transform
+        self.img_size = img_size
+        self.folder = folder
+        self.label_columns = [
+            "antelope_duiker",
+            "bird",
+            "blank",
+            "civet_genet",
+            "hog",
+            "leopard",
+            "monkey_prosimian",
+            "rodent",
+        ]
+        IMAGENET_MEAN = [0.485, 0.456, 0.406]
+        IMAGENET_STD = [0.229, 0.224, 0.225]
+        blank_transform = transforms.Compose([
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomResizedCrop(
+                img_size,
+                scale=(0.85, 1.0),
+                ratio=(0.9, 1.1)
+            ),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        antelope_transform = transforms.Compose([
+            transforms.RandomResizedCrop(
+                img_size,
+                scale=(0.85, 1.0),
+                ratio=(0.9, 1.1)
+            ),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ColorJitter(
+                contrast=0.1,
+                brightness=0.0,
+                saturation=0.05,
+                hue=0.0
+            ),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        rodent_transform = transforms.Compose([
+            transforms.RandomResizedCrop(
+                img_size,
+                scale=(0.9, 1.0),
+                ratio=(0.95, 1.05)
+            ),
+            # transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ColorJitter(
+                contrast=0.1,
+                brightness=0.0,
+                saturation=0.0,
+                hue=0.0
+            ),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        monkey_transform = transforms.Compose([
+            transforms.RandomResizedCrop(
+                img_size,
+                scale=(0.9, 1.0),
+                ratio=(0.9, 1.1)
+            ),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ColorJitter(
+                contrast=0.05,
+                brightness=0.0,
+                saturation=0.0,
+                hue=0.0
+            ),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        
+        bird_transform = transforms.Compose([
+            transforms.RandomResizedCrop(
+                img_size,
+                scale=(0.9, 1.0),
+                ratio=(0.9, 1.1)
+            ),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        hog_transform = transforms.Compose([
+            transforms.RandomResizedCrop(
+                img_size,
+                scale=(0.9, 1.0),
+                ratio=(0.9, 1.1)
+            ),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        leopard_transform = transforms.Compose([
+            transforms.RandomResizedCrop(
+                img_size,
+                scale=(0.9, 1.0),
+                ratio=(0.9, 1.1)
+            ),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+
+
+        civet_genet_transform = transforms.Compose([
+            transforms.RandomResizedCrop(
+                img_size,
+                scale=(0.9, 1.0),
+                ratio=(0.9, 1.1)
+            ),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ColorJitter(
+                contrast=0.05,
+                brightness=0.0,
+                saturation=0.0,
+                hue=0.0
+            ),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+
+        
+        self.class_transforms = {
+            "blank": blank_transform,
+            "antelope_duiker": antelope_transform,
+            "rodent": rodent_transform,
+            "monkey_prosimian": monkey_transform,
+            "bird": bird_transform,
+            "hog": hog_transform,
+            "leopard": leopard_transform,
+            "civet_genet": civet_genet_transform,
+        }
+        self.labels = dataframe[self.label_columns].values.argmax(axis=1)
+    def __len__(self):
+        return len(self.dataframe)
+    def __getitem__(self, idx):
+        id = self.dataframe.iloc[idx]["id"]
+        filename = id + ".jpg"
+        image_path = os.path.join(self.folder, filename)
+        try:
+            if not os.path.exists(image_path):
+                raise FileNotFoundError(f"Image file not found: {image_path}")
+            image = Image.open(image_path).convert("RGB")
+        except Exception as e:
+            print(f"Error loading {image_path}: {e}")
+            image = Image.new('RGB', (self.img_size, self.img_size), color=(128, 128, 128))
+     
+        if self.transform:
+            image = self.transform(image)
+        else:
+            transform = self.class_transforms[self.label_columns[self.labels[idx]]]
+            image = transform(image)
+        return image, self.labels[idx], self.dataframe.iloc[idx]["id"]
+    def get_y(self):
+        return self.labels
+
+
+Swin Test 3
+
+
+class AnimalDatasetSwin(Dataset):
+    def __init__(self, dataframe, transform=None, folder="", img_size=224):
+        self.dataframe = dataframe.reset_index(drop=True)
+        self.transform = transform
+        self.img_size = img_size
+        self.folder = folder
+        self.label_columns = [
+            "antelope_duiker",
+            "bird",
+            "blank",
+            "civet_genet",
+            "hog",
+            "leopard",
+            "monkey_prosimian",
+            "rodent",
+        ]
+        IMAGENET_MEAN = [0.485, 0.456, 0.406]
+        IMAGENET_STD = [0.229, 0.224, 0.225]
+        blank_transform = transforms.Compose([
+        transforms.RandomRotation(degrees=(0, 30), fill=128),
+        transforms.Resize((img_size, img_size)),
+        transforms.RandomHorizontalFlip(p=0.4),
+        transforms.ColorJitter(brightness=(0.7, 1.2), contrast=(0.7, 1.2), saturation=(0.7, 1.2)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+        
+          # train_transform = transforms.Compose(
+    #     [
+    #         transforms.RandomRotation(degrees=(0, 30), fill=128),
+    #         transforms.Resize((img_size, img_size)),
+    #         transforms.RandomHorizontalFlip(p=0.4),
+    #         transforms.ColorJitter(brightness=(0.7, 1.2), contrast=(0.7, 1.2), saturation=(0.7, 1.2)),
+    #         transforms.ToTensor(),
+    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    #         # transforms.RandomErasing(),
+    #     ]
+    # )
+        antelope_transform = transforms.Compose([
+          transforms.RandomRotation(degrees=(0, 30), fill=128),
+            transforms.Resize((img_size, img_size)),
+            transforms.RandomHorizontalFlip(p=0.4),
+            transforms.ColorJitter(brightness=(0.7, 1.2), contrast=(0.7, 1.2), saturation=(0.7, 1.2)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+        rodent_transform = transforms.Compose([
+            transforms.Resize((img_size, img_size)),
+
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        monkey_transform = transforms.Compose([
+            transforms.Resize((img_size, img_size)),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        
+        bird_transform = transforms.Compose([
+          transforms.Resize((img_size, img_size)),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        hog_transform = transforms.Compose([
+            transforms.Resize((img_size, img_size)),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+        leopard_transform = transforms.Compose([
+          transforms.Resize((img_size, img_size)),
+            transforms.ToTensor(),
+            transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+
+
+        civet_genet_transform = transforms.Compose([
+                transforms.Resize((img_size, img_size)),
+                transforms.ToTensor(),
+                transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
+        ])
+
+        
+        self.class_transforms = {
+            "blank": blank_transform,
+            "antelope_duiker": antelope_transform,
+            "rodent": rodent_transform,
+            "monkey_prosimian": monkey_transform,
+            "bird": bird_transform,
+            "hog": hog_transform,
+            "leopard": leopard_transform,
+            "civet_genet": civet_genet_transform,
+        }
+        self.labels = dataframe[self.label_columns].values.argmax(axis=1)
+    def __len__(self):
+        return len(self.dataframe)
+    def __getitem__(self, idx):
+        id = self.dataframe.iloc[idx]["id"]
+        filename = id + ".jpg"
+        image_path = os.path.join(self.folder, filename)
+        try:
+            if not os.path.exists(image_path):
+                raise FileNotFoundError(f"Image file not found: {image_path}")
+            image = Image.open(image_path).convert("RGB")
+        except Exception as e:
+            print(f"Error loading {image_path}: {e}")
+            image = Image.new('RGB', (self.img_size, self.img_size), color=(128, 128, 128))
+     
+        if self.transform:
+            image = self.transform(image)
+        else:
+            transform = self.class_transforms[self.label_columns[self.labels[idx]]]
+            image = transform(image)
+        return image, self.labels[idx], self.dataframe.iloc[idx]["id"]
+    def get_y(self):
+        return self.labels
