@@ -1,4 +1,5 @@
 # Minimal requirements for SageMaker training
 # PyTorch, numpy, and Pillow are pre-installed in SageMaker PyTorch containers
 pandas>=2.0.0
-
+timm
+albumentationsx

@@ -1,0 +1,6838 @@
+[
+  {
+    "antelope_duiker": {
+      "precision": 0.8235294117647058,
+      "recall": 0.7903225806451613,
+      "f1-score": 0.8065843621399177,
+      "support": 124.0
+    },
+    "bird": {
+      "precision": 0.9090909090909091,
+      "recall": 0.8536585365853658,
+      "f1-score": 0.8805031446540881,
+      "support": 82.0
+    },
+    "blank": {
+      "precision": 0.6578947368421053,
+      "recall": 0.6756756756756757,
+      "f1-score": 0.6666666666666666,
+      "support": 111.0
+    },
+    "civet_genet": {
+      "precision": 0.9112903225806451,
+      "recall": 0.9338842975206612,
+      "f1-score": 0.9224489795918367,
+      "support": 121.0
+    },
+    "hog": {
+      "precision": 0.94,
+      "recall": 0.9591836734693877,
+      "f1-score": 0.9494949494949495,
+      "support": 49.0
+    },
+    "leopard": {
+      "precision": 0.9304347826086956,
+      "recall": 0.9469026548672567,
+      "f1-score": 0.9385964912280702,
+      "support": 113.0
+    },
+    "monkey_prosimian": {
+      "precision": 0.8728813559322034,
+      "recall": 0.8306451612903226,
+      "f1-score": 0.8512396694214877,
+      "support": 124.0
+    },
+    "rodent": {
+      "precision": 0.7962962962962963,
+      "recall": 0.8514851485148515,
+      "f1-score": 0.8229665071770335,
+      "support": 101.0
+    },
+    "accuracy": 0.8472727272727273,
+    "macro avg": {
+      "precision": 0.8551772268894451,
+      "recall": 0.8552197160710853,
+      "f1-score": 0.8548125962967562,
+      "support": 825.0
+    },
+    "weighted avg": {
+      "precision": 0.8482641102088625,
+      "recall": 0.8472727272727273,
+      "f1-score": 0.847386712199717,
+      "support": 825.0
+    },
+    "confusion_matrix": [
+      [
+        98,
+        3,
+        13,
+        3,
+        0,
+        2,
+        3,
+        2
+      ],
+      [
+        2,
+        70,
+        4,
+        0,
+        0,
+        1,
+        2,
+        3
+      ],
+      [
+        9,
+        3,
+        75,
+        2,
+        1,
+        4,
+        7,
+        10
+      ],
+      [
+        0,
+        0,
+        1,
+        113,
+        0,
+        1,
+        0,
+        6
+      ],
+      [
+        1,
+        0,
+        0,
+        1,
+        47,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        1,
+        0,
+        2,
+        107,
+        2,
+        0
+      ],
+      [
+        8,
+        1,
+        11,
+        0,
+        0,
+        0,
+        103,
+        1
+      ],
+      [
+        0,
+        0,
+        9,
+        5,
+        0,
+        0,
+        1,
+        86
+      ]
+    ],
+    "loss": 0.48113034082181527,
+    "acc": 0.8472727272727273,
+    "misclassified_images": [
+      {
+        "id": "ZJ009800",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.38727277517318726
+      },
+      {
+        "id": "ZJ001248",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.746997058391571
+      },
+      {
+        "id": "ZJ009971",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.7535091638565063
+      },
+      {
+        "id": "ZJ010497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8730880618095398
+      },
+      {
+        "id": "ZJ007603",
+        "true_label": "antelope_duiker",
+        "predicted_label": "bird",
+        "probability": 0.4730570912361145
+      },
+      {
+        "id": "ZJ008586",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.5826277732849121
+      },
+      {
+        "id": "ZJ011707",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.6451948285102844
+      },
+      {
+        "id": "ZJ011154",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.8466694355010986
+      },
+      {
+        "id": "ZJ008339",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.6856127977371216
+      },
+      {
+        "id": "ZJ006946",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.4107254147529602
+      },
+      {
+        "id": "ZJ014029",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8318706750869751
+      },
+      {
+        "id": "ZJ006097",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.61728435754776
+      },
+      {
+        "id": "ZJ009481",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.4773670434951782
+      },
+      {
+        "id": "ZJ012267",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.8588349223136902
+      },
+      {
+        "id": "ZJ016104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8453490138053894
+      },
+      {
+        "id": "ZJ003307",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "rodent",
+        "probability": 0.9277411699295044
+      },
+      {
+        "id": "ZJ015741",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.7205982208251953
+      },
+      {
+        "id": "ZJ016211",
+        "true_label": "civet_genet",
+        "predicted_label": "leopard",
+        "probability": 0.7197259664535522
+      },
+      {
+        "id": "ZJ010073",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.7383069396018982
+      },
+      {
+        "id": "ZJ009335",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6339870095252991
+      },
+      {
+        "id": "ZJ014256",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5487977862358093
+      },
+      {
+        "id": "ZJ005260",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.7488548755645752
+      },
+      {
+        "id": "ZJ009497",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.9287166595458984
+      },
+      {
+        "id": "ZJ015860",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.7828882932662964
+      },
+      {
+        "id": "ZJ005465",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9964603781700134
+      },
+      {
+        "id": "ZJ003493",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.752502977848053
+      },
+      {
+        "id": "ZJ004932",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.7073708772659302
+      },
+      {
+        "id": "ZJ008841",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.49147918820381165
+      },
+      {
+        "id": "ZJ003962",
+        "true_label": "hog",
+        "predicted_label": "civet_genet",
+        "probability": 0.7264807820320129
+      },
+      {
+        "id": "ZJ012903",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.8867444396018982
+      },
+      {
+        "id": "ZJ014837",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6467512249946594
+      },
+      {
+        "id": "ZJ002705",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.4793379604816437
+      },
+      {
+        "id": "ZJ009715",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7944730520248413
+      },
+      {
+        "id": "ZJ011873",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8922033309936523
+      },
+      {
+        "id": "ZJ013115",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.759958028793335
+      },
+      {
+        "id": "ZJ013547",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.6537472605705261
+      },
+      {
+        "id": "ZJ003467",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.5632760524749756
+      },
+      {
+        "id": "ZJ001512",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.7357535362243652
+      },
+      {
+        "id": "ZJ006560",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.8350968360900879
+      },
+      {
+        "id": "ZJ008621",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9030588269233704
+      },
+      {
+        "id": "ZJ013826",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.45192697644233704
+      },
+      {
+        "id": "ZJ007898",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.8051956295967102
+      },
+      {
+        "id": "ZJ000534",
+        "true_label": "leopard",
+        "predicted_label": "hog",
+        "probability": 0.9235564470291138
+      },
+      {
+        "id": "ZJ006413",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.4250803589820862
+      },
+      {
+        "id": "ZJ011844",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.6795621514320374
+      },
+      {
+        "id": "ZJ000567",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.4823162257671356
+      },
+      {
+        "id": "ZJ002892",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.7550191283226013
+      },
+      {
+        "id": "ZJ002572",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.825475811958313
+      },
+      {
+        "id": "ZJ007791",
+        "true_label": "bird",
+        "predicted_label": "leopard",
+        "probability": 0.5000749826431274
+      },
+      {
+        "id": "ZJ008523",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.43452703952789307
+      },
+      {
+        "id": "ZJ000298",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8700811266899109
+      },
+      {
+        "id": "ZJ014588",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.500621497631073
+      },
+      {
+        "id": "ZJ001105",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.4619739055633545
+      },
+      {
+        "id": "ZJ000351",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.552973210811615
+      },
+      {
+        "id": "ZJ003284",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9070290327072144
+      },
+      {
+        "id": "ZJ006636",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.7397487163543701
+      },
+      {
+        "id": "ZJ008083",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9994537234306335
+      },
+      {
+        "id": "ZJ010282",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.560931921005249
+      },
+      {
+        "id": "ZJ003342",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.7311328649520874
+      },
+      {
+        "id": "ZJ000857",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9542742371559143
+      },
+      {
+        "id": "ZJ008058",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.7268231511116028
+      },
+      {
+        "id": "ZJ014817",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.7207625508308411
+      },
+      {
+        "id": "ZJ012822",
+        "true_label": "leopard",
+        "predicted_label": "hog",
+        "probability": 0.5896838903427124
+      },
+      {
+        "id": "ZJ009429",
+        "true_label": "antelope_duiker",
+        "predicted_label": "bird",
+        "probability": 0.4333217442035675
+      },
+      {
+        "id": "ZJ000141",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.5334815382957458
+      },
+      {
+        "id": "ZJ003074",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.6160477995872498
+      },
+      {
+        "id": "ZJ012239",
+        "true_label": "rodent",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.3119586408138275
+      },
+      {
+        "id": "ZJ010012",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.6698676347732544
+      },
+      {
+        "id": "ZJ012757",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6479057669639587
+      },
+      {
+        "id": "ZJ012341",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.5407063961029053
+      },
+      {
+        "id": "ZJ003729",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.6214718222618103
+      },
+      {
+        "id": "ZJ009342",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.5255372524261475
+      },
+      {
+        "id": "ZJ009895",
+        "true_label": "leopard",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.529465913772583
+      },
+      {
+        "id": "ZJ007200",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.4627266824245453
+      },
+      {
+        "id": "ZJ003669",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.4518639147281647
+      },
+      {
+        "id": "ZJ010304",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.6896458864212036
+      },
+      {
+        "id": "ZJ006609",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.4958600401878357
+      },
+      {
+        "id": "ZJ007838",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.5182392001152039
+      },
+      {
+        "id": "ZJ001761",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6526400446891785
+      },
+      {
+        "id": "ZJ012704",
+        "true_label": "antelope_duiker",
+        "predicted_label": "leopard",
+        "probability": 0.9871711134910583
+      },
+      {
+        "id": "ZJ008130",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.465910941362381
+      },
+      {
+        "id": "ZJ011085",
+        "true_label": "antelope_duiker",
+        "predicted_label": "leopard",
+        "probability": 0.7884482741355896
+      },
+      {
+        "id": "ZJ015487",
+        "true_label": "blank",
+        "predicted_label": "hog",
+        "probability": 0.5005284547805786
+      },
+      {
+        "id": "ZJ007509",
+        "true_label": "leopard",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.46694329380989075
+      },
+      {
+        "id": "ZJ005344",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6271939277648926
+      },
+      {
+        "id": "ZJ008776",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9748802781105042
+      },
+      {
+        "id": "ZJ011986",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.7250778079032898
+      },
+      {
+        "id": "ZJ008029",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.45570942759513855
+      },
+      {
+        "id": "ZJ002581",
+        "true_label": "antelope_duiker",
+        "predicted_label": "bird",
+        "probability": 0.4679088592529297
+      },
+      {
+        "id": "ZJ001681",
+        "true_label": "bird",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5841897130012512
+      },
+      {
+        "id": "ZJ012799",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.6328188180923462
+      },
+      {
+        "id": "ZJ001241",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.5099261403083801
+      },
+      {
+        "id": "ZJ013605",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.801334023475647
+      },
+      {
+        "id": "ZJ003782",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5989862084388733
+      },
+      {
+        "id": "ZJ013642",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6535415053367615
+      },
+      {
+        "id": "ZJ010928",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8561556339263916
+      },
+      {
+        "id": "ZJ003496",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.5756003260612488
+      },
+      {
+        "id": "ZJ010287",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.47683125734329224
+      },
+      {
+        "id": "ZJ001518",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.9979696869850159
+      },
+      {
+        "id": "ZJ006498",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.8549886345863342
+      },
+      {
+        "id": "ZJ005818",
+        "true_label": "bird",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.7320346832275391
+      },
+      {
+        "id": "ZJ003909",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.38783884048461914
+      },
+      {
+        "id": "ZJ004887",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.3745163679122925
+      },
+      {
+        "id": "ZJ012612",
+        "true_label": "bird",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.6195880174636841
+      },
+      {
+        "id": "ZJ008258",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.41070255637168884
+      },
+      {
+        "id": "ZJ003012",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9640706181526184
+      },
+      {
+        "id": "ZJ002104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.7086181044578552
+      },
+      {
+        "id": "ZJ015606",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.445417582988739
+      },
+      {
+        "id": "ZJ002657",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.46795088052749634
+      },
+      {
+        "id": "ZJ004676",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.3891140818595886
+      },
+      {
+        "id": "ZJ005400",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "bird",
+        "probability": 0.6084128618240356
+      },
+      {
+        "id": "ZJ009425",
+        "true_label": "bird",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8449281454086304
+      },
+      {
+        "id": "ZJ000518",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.708263099193573
+      },
+      {
+        "id": "ZJ003009",
+        "true_label": "leopard",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5451678037643433
+      },
+      {
+        "id": "ZJ004854",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.8754965662956238
+      },
+      {
+        "id": "ZJ010813",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.5169247388839722
+      },
+      {
+        "id": "ZJ008497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.45566898584365845
+      },
+      {
+        "id": "ZJ000676",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.4864630699157715
+      },
+      {
+        "id": "ZJ007556",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8115086555480957
+      },
+      {
+        "id": "ZJ013619",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.5452965497970581
+      },
+      {
+        "id": "ZJ011808",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.4723986089229584
+      },
+      {
+        "id": "ZJ004628",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6329516172409058
+      },
+      {
+        "id": "ZJ003564",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.5144145488739014
+      },
+      {
+        "id": "ZJ010529",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5328497290611267
+      },
+      {
+        "id": "ZJ002215",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9832894206047058
+      },
+      {
+        "id": "ZJ003417",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.42040330171585083
+      }
+    ],
+    "log_loss": 0.48113032784964105,
+    "top3_accuracy": 0.9660606060606061,
+    "class_confidences": {
+      "antelope_duiker": 0.8640395417934706,
+      "bird": 0.9162224612452767,
+      "blank": 0.6847468632877919,
+      "civet_genet": 0.9426500427146112,
+      "hog": 0.9521840822696686,
+      "leopard": 0.9677357650321463,
+      "monkey_prosimian": 0.8828918698985698,
+      "rodent": 0.7713157344195578
+    },
+    "macro_precision": 0.8551772268894451,
+    "macro_recall": 0.8552197160710853,
+    "macro_f1": 0.8548125962967562,
+    "micro_precision": 0.8472727272727273,
+    "micro_recall": 0.8472727272727273,
+    "micro_f1": 0.8472727272727273,
+    "weighted_precision": 0.8482641102088625,
+    "weighted_recall": 0.8472727272727273,
+    "weighted_f1": 0.847386712199717,
+    "epoch": 0,
+    "lr_before": 0.0001,
+    "lr_after": 9.755282581475769e-05,
+    "class_f1s": {
+      "antelope_duiker": 0.8065843621399177,
+      "bird": 0.8805031446540881,
+      "blank": 0.6666666666666666,
+      "civet_genet": 0.9224489795918367,
+      "hog": 0.9494949494949495,
+      "leopard": 0.9385964912280702,
+      "monkey_prosimian": 0.8512396694214877,
+      "rodent": 0.8229665071770335
+    },
+    "class_precisions": {
+      "antelope_duiker": 0.8235294117647058,
+      "bird": 0.9090909090909091,
+      "blank": 0.6578947368421053,
+      "civet_genet": 0.9112903225806451,
+      "hog": 0.94,
+      "leopard": 0.9304347826086956,
+      "monkey_prosimian": 0.8728813559322034,
+      "rodent": 0.7962962962962963
+    },
+    "class_recalls": {
+      "antelope_duiker": 0.7903225806451613,
+      "bird": 0.8536585365853658,
+      "blank": 0.6756756756756757,
+      "civet_genet": 0.9338842975206612,
+      "hog": 0.9591836734693877,
+      "leopard": 0.9469026548672567,
+      "monkey_prosimian": 0.8306451612903226,
+      "rodent": 0.8514851485148515
+    }
+  },
+  {
+    "antelope_duiker": {
+      "precision": 0.8015873015873016,
+      "recall": 0.8145161290322581,
+      "f1-score": 0.808,
+      "support": 124.0
+    },
+    "bird": {
+      "precision": 0.9125,
+      "recall": 0.8902439024390244,
+      "f1-score": 0.9012345679012346,
+      "support": 82.0
+    },
+    "blank": {
+      "precision": 0.7115384615384616,
+      "recall": 0.6666666666666666,
+      "f1-score": 0.6883720930232559,
+      "support": 111.0
+    },
+    "civet_genet": {
+      "precision": 0.8863636363636364,
+      "recall": 0.9669421487603306,
+      "f1-score": 0.924901185770751,
+      "support": 121.0
+    },
+    "hog": {
+      "precision": 1.0,
+      "recall": 0.9183673469387755,
+      "f1-score": 0.9574468085106383,
+      "support": 49.0
+    },
+    "leopard": {
+      "precision": 0.9807692307692307,
+      "recall": 0.9026548672566371,
+      "f1-score": 0.9400921658986175,
+      "support": 113.0
+    },
+    "monkey_prosimian": {
+      "precision": 0.8888888888888888,
+      "recall": 0.9032258064516129,
+      "f1-score": 0.896,
+      "support": 124.0
+    },
+    "rodent": {
+      "precision": 0.8425925925925926,
+      "recall": 0.900990099009901,
+      "f1-score": 0.8708133971291866,
+      "support": 101.0
+    },
+    "accuracy": 0.8666666666666667,
+    "macro avg": {
+      "precision": 0.8780300139675139,
+      "recall": 0.8704508708194008,
+      "f1-score": 0.8733575272792106,
+      "support": 825.0
+    },
+    "weighted avg": {
+      "precision": 0.8673982930649597,
+      "recall": 0.8666666666666667,
+      "f1-score": 0.8662024749640684,
+      "support": 825.0
+    },
+    "confusion_matrix": [
+      [
+        101,
+        1,
+        12,
+        3,
+        0,
+        0,
+        5,
+        2
+      ],
+      [
+        0,
+        73,
+        4,
+        0,
+        0,
+        0,
+        2,
+        3
+      ],
+      [
+        13,
+        3,
+        74,
+        3,
+        0,
+        2,
+        7,
+        9
+      ],
+      [
+        2,
+        0,
+        0,
+        117,
+        0,
+        0,
+        0,
+        2
+      ],
+      [
+        3,
+        0,
+        0,
+        1,
+        45,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        2,
+        8,
+        0,
+        0,
+        102,
+        0,
+        0
+      ],
+      [
+        6,
+        1,
+        4,
+        0,
+        0,
+        0,
+        112,
+        1
+      ],
+      [
+        0,
+        0,
+        2,
+        8,
+        0,
+        0,
+        0,
+        91
+      ]
+    ],
+    "loss": 0.4005770639939742,
+    "acc": 0.8666666666666667,
+    "misclassified_images": [
+      {
+        "id": "ZJ009800",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5050408244132996
+      },
+      {
+        "id": "ZJ001248",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.5928834080696106
+      },
+      {
+        "id": "ZJ009971",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.3972357213497162
+      },
+      {
+        "id": "ZJ007603",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6256322264671326
+      },
+      {
+        "id": "ZJ011707",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.9048879146575928
+      },
+      {
+        "id": "ZJ008339",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.629464328289032
+      },
+      {
+        "id": "ZJ014029",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.7196444869041443
+      },
+      {
+        "id": "ZJ006097",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.961677074432373
+      },
+      {
+        "id": "ZJ012267",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9765808582305908
+      },
+      {
+        "id": "ZJ016104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8186691403388977
+      },
+      {
+        "id": "ZJ009637",
+        "true_label": "bird",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.33735746145248413
+      },
+      {
+        "id": "ZJ003307",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "rodent",
+        "probability": 0.6139855980873108
+      },
+      {
+        "id": "ZJ012548",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.6172954440116882
+      },
+      {
+        "id": "ZJ005669",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6412337422370911
+      },
+      {
+        "id": "ZJ016211",
+        "true_label": "civet_genet",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7784223556518555
+      },
+      {
+        "id": "ZJ014256",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7555946707725525
+      },
+      {
+        "id": "ZJ005260",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.9335535764694214
+      },
+      {
+        "id": "ZJ009497",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.9540202021598816
+      },
+      {
+        "id": "ZJ015860",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.8037647604942322
+      },
+      {
+        "id": "ZJ005465",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9992412328720093
+      },
+      {
+        "id": "ZJ008922",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.8037002086639404
+      },
+      {
+        "id": "ZJ004932",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9792971014976501
+      },
+      {
+        "id": "ZJ008841",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.42019137740135193
+      },
+      {
+        "id": "ZJ003962",
+        "true_label": "hog",
+        "predicted_label": "civet_genet",
+        "probability": 0.8512519001960754
+      },
+      {
+        "id": "ZJ012903",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.4006558358669281
+      },
+      {
+        "id": "ZJ009715",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8039281964302063
+      },
+      {
+        "id": "ZJ008069",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.46469587087631226
+      },
+      {
+        "id": "ZJ011873",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.7325974702835083
+      },
+      {
+        "id": "ZJ001018",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.4400610327720642
+      },
+      {
+        "id": "ZJ013547",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9514457583427429
+      },
+      {
+        "id": "ZJ003467",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.6839473843574524
+      },
+      {
+        "id": "ZJ001512",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.7713565230369568
+      },
+      {
+        "id": "ZJ007793",
+        "true_label": "civet_genet",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.3967762887477875
+      },
+      {
+        "id": "ZJ006560",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.9741960167884827
+      },
+      {
+        "id": "ZJ008621",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.3877510726451874
+      },
+      {
+        "id": "ZJ008624",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.509405791759491
+      },
+      {
+        "id": "ZJ007898",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.670637845993042
+      },
+      {
+        "id": "ZJ000534",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.5557031631469727
+      },
+      {
+        "id": "ZJ011844",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9340224862098694
+      },
+      {
+        "id": "ZJ000567",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.7021455764770508
+      },
+      {
+        "id": "ZJ002892",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.47404780983924866
+      },
+      {
+        "id": "ZJ015048",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.47856253385543823
+      },
+      {
+        "id": "ZJ000140",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.893950879573822
+      },
+      {
+        "id": "ZJ005286",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7384832501411438
+      },
+      {
+        "id": "ZJ002572",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.806794285774231
+      },
+      {
+        "id": "ZJ007791",
+        "true_label": "bird",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.367043137550354
+      },
+      {
+        "id": "ZJ008523",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.44343698024749756
+      },
+      {
+        "id": "ZJ000298",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6043386459350586
+      },
+      {
+        "id": "ZJ014588",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5479192137718201
+      },
+      {
+        "id": "ZJ001105",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6671937108039856
+      },
+      {
+        "id": "ZJ003096",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.5973212718963623
+      },
+      {
+        "id": "ZJ000815",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.7251565456390381
+      },
+      {
+        "id": "ZJ000351",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7546481490135193
+      },
+      {
+        "id": "ZJ003284",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.6803008913993835
+      },
+      {
+        "id": "ZJ006636",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.7819051146507263
+      },
+      {
+        "id": "ZJ008083",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9995550513267517
+      },
+      {
+        "id": "ZJ007054",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.5393377542495728
+      },
+      {
+        "id": "ZJ010282",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.8107724189758301
+      },
+      {
+        "id": "ZJ000857",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9821550846099854
+      },
+      {
+        "id": "ZJ008058",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7464361786842346
+      },
+      {
+        "id": "ZJ000141",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.8711284399032593
+      },
+      {
+        "id": "ZJ003279",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.8744083046913147
+      },
+      {
+        "id": "ZJ005911",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6038299202919006
+      },
+      {
+        "id": "ZJ007599",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.35060280561447144
+      },
+      {
+        "id": "ZJ003729",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.7167550921440125
+      },
+      {
+        "id": "ZJ005880",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9436991810798645
+      },
+      {
+        "id": "ZJ009895",
+        "true_label": "leopard",
+        "predicted_label": "bird",
+        "probability": 0.8997254371643066
+      },
+      {
+        "id": "ZJ007200",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.7268953919410706
+      },
+      {
+        "id": "ZJ003669",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.5403190851211548
+      },
+      {
+        "id": "ZJ010304",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.5895867943763733
+      },
+      {
+        "id": "ZJ006609",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.49121078848838806
+      },
+      {
+        "id": "ZJ007838",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.7005172371864319
+      },
+      {
+        "id": "ZJ008530",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.39960968494415283
+      },
+      {
+        "id": "ZJ012704",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.7653406262397766
+      },
+      {
+        "id": "ZJ011085",
+        "true_label": "antelope_duiker",
+        "predicted_label": "bird",
+        "probability": 0.5046926140785217
+      },
+      {
+        "id": "ZJ007509",
+        "true_label": "leopard",
+        "predicted_label": "bird",
+        "probability": 0.6517850756645203
+      },
+      {
+        "id": "ZJ005344",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.4071408808231354
+      },
+      {
+        "id": "ZJ008029",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.5537088513374329
+      },
+      {
+        "id": "ZJ015931",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.7261329889297485
+      },
+      {
+        "id": "ZJ001241",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.48361918330192566
+      },
+      {
+        "id": "ZJ003782",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.44971713423728943
+      },
+      {
+        "id": "ZJ010928",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5558798909187317
+      },
+      {
+        "id": "ZJ003496",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.4728223383426666
+      },
+      {
+        "id": "ZJ002721",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.7645742893218994
+      },
+      {
+        "id": "ZJ010287",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5298552513122559
+      },
+      {
+        "id": "ZJ001384",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.48766037821769714
+      },
+      {
+        "id": "ZJ001518",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.8814712762832642
+      },
+      {
+        "id": "ZJ006498",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.8300097584724426
+      },
+      {
+        "id": "ZJ014641",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.40897834300994873
+      },
+      {
+        "id": "ZJ009966",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.7262294888496399
+      },
+      {
+        "id": "ZJ008258",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.6032558679580688
+      },
+      {
+        "id": "ZJ003012",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9174242615699768
+      },
+      {
+        "id": "ZJ002104",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6249060034751892
+      },
+      {
+        "id": "ZJ015606",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.8172851800918579
+      },
+      {
+        "id": "ZJ002657",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6376652121543884
+      },
+      {
+        "id": "ZJ005400",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "bird",
+        "probability": 0.637600302696228
+      },
+      {
+        "id": "ZJ008591",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.543936014175415
+      },
+      {
+        "id": "ZJ004106",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6550613641738892
+      },
+      {
+        "id": "ZJ000518",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.38321653008461
+      },
+      {
+        "id": "ZJ001339",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.354854941368103
+      },
+      {
+        "id": "ZJ008345",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.5057722330093384
+      },
+      {
+        "id": "ZJ008497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.4245331287384033
+      },
+      {
+        "id": "ZJ000676",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.7831873297691345
+      },
+      {
+        "id": "ZJ013619",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.7832528352737427
+      },
+      {
+        "id": "ZJ010636",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.6916609406471252
+      },
+      {
+        "id": "ZJ010028",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.5085147023200989
+      },
+      {
+        "id": "ZJ003564",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.5280000567436218
+      },
+      {
+        "id": "ZJ000707",
+        "true_label": "leopard",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.34004637598991394
+      },
+      {
+        "id": "ZJ002215",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9801150560379028
+      },
+      {
+        "id": "ZJ003417",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.7372391819953918
+      }
+    ],
+    "log_loss": 0.40057706743320287,
+    "top3_accuracy": 0.9818181818181818,
+    "class_confidences": {
+      "antelope_duiker": 0.8579939783565582,
+      "bird": 0.9560317479074001,
+      "blank": 0.7375576731104118,
+      "civet_genet": 0.9578894627365199,
+      "hog": 0.9416446036762661,
+      "leopard": 0.9570341717738372,
+      "monkey_prosimian": 0.8949086346796581,
+      "rodent": 0.8351814517820323
+    },
+    "macro_precision": 0.8780300139675139,
+    "macro_recall": 0.8704508708194008,
+    "macro_f1": 0.8733575272792106,
+    "micro_precision": 0.8666666666666667,
+    "micro_recall": 0.8666666666666667,
+    "micro_f1": 0.8666666666666667,
+    "weighted_precision": 0.8673982930649597,
+    "weighted_recall": 0.8666666666666667,
+    "weighted_f1": 0.8662024749640684,
+    "epoch": 1,
+    "lr_before": 9.755282581475769e-05,
+    "lr_after": 9.045084971874737e-05,
+    "class_f1s": {
+      "antelope_duiker": 0.808,
+      "bird": 0.9012345679012346,
+      "blank": 0.6883720930232559,
+      "civet_genet": 0.924901185770751,
+      "hog": 0.9574468085106383,
+      "leopard": 0.9400921658986175,
+      "monkey_prosimian": 0.896,
+      "rodent": 0.8708133971291866
+    },
+    "class_precisions": {
+      "antelope_duiker": 0.8015873015873016,
+      "bird": 0.9125,
+      "blank": 0.7115384615384616,
+      "civet_genet": 0.8863636363636364,
+      "hog": 1.0,
+      "leopard": 0.9807692307692307,
+      "monkey_prosimian": 0.8888888888888888,
+      "rodent": 0.8425925925925926
+    },
+    "class_recalls": {
+      "antelope_duiker": 0.8145161290322581,
+      "bird": 0.8902439024390244,
+      "blank": 0.6666666666666666,
+      "civet_genet": 0.9669421487603306,
+      "hog": 0.9183673469387755,
+      "leopard": 0.9026548672566371,
+      "monkey_prosimian": 0.9032258064516129,
+      "rodent": 0.900990099009901
+    }
+  },
+  {
+    "antelope_duiker": {
+      "precision": 0.8387096774193549,
+      "recall": 0.8387096774193549,
+      "f1-score": 0.8387096774193549,
+      "support": 124.0
+    },
+    "bird": {
+      "precision": 0.9058823529411765,
+      "recall": 0.9390243902439024,
+      "f1-score": 0.9221556886227545,
+      "support": 82.0
+    },
+    "blank": {
+      "precision": 0.7403846153846154,
+      "recall": 0.6936936936936937,
+      "f1-score": 0.7162790697674418,
+      "support": 111.0
+    },
+    "civet_genet": {
+      "precision": 0.9663865546218487,
+      "recall": 0.9504132231404959,
+      "f1-score": 0.9583333333333334,
+      "support": 121.0
+    },
+    "hog": {
+      "precision": 0.8727272727272727,
+      "recall": 0.9795918367346939,
+      "f1-score": 0.9230769230769231,
+      "support": 49.0
+    },
+    "leopard": {
+      "precision": 0.981651376146789,
+      "recall": 0.9469026548672567,
+      "f1-score": 0.963963963963964,
+      "support": 113.0
+    },
+    "monkey_prosimian": {
+      "precision": 0.9553571428571429,
+      "recall": 0.8629032258064516,
+      "f1-score": 0.9067796610169492,
+      "support": 124.0
+    },
+    "rodent": {
+      "precision": 0.8376068376068376,
+      "recall": 0.9702970297029703,
+      "f1-score": 0.8990825688073395,
+      "support": 101.0
+    },
+    "accuracy": 0.8884848484848484,
+    "macro avg": {
+      "precision": 0.8873382287131297,
+      "recall": 0.8976919664511025,
+      "f1-score": 0.8910476107510076,
+      "support": 825.0
+    },
+    "weighted avg": {
+      "precision": 0.8898795594411059,
+      "recall": 0.8884848484848484,
+      "f1-score": 0.8878652013562733,
+      "support": 825.0
+    },
+    "confusion_matrix": [
+      [
+        104,
+        2,
+        12,
+        1,
+        2,
+        0,
+        1,
+        2
+      ],
+      [
+        0,
+        77,
+        3,
+        0,
+        0,
+        0,
+        0,
+        2
+      ],
+      [
+        10,
+        3,
+        77,
+        3,
+        2,
+        1,
+        4,
+        11
+      ],
+      [
+        1,
+        0,
+        2,
+        115,
+        0,
+        0,
+        0,
+        3
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        48,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        2,
+        0,
+        3,
+        107,
+        0,
+        0
+      ],
+      [
+        9,
+        2,
+        4,
+        0,
+        0,
+        1,
+        107,
+        1
+      ],
+      [
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        98
+      ]
+    ],
+    "loss": 0.3759959767081521,
+    "acc": 0.8884848484848484,
+    "misclassified_images": [
+      {
+        "id": "ZJ009800",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.48747339844703674
+      },
+      {
+        "id": "ZJ007603",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9273188710212708
+      },
+      {
+        "id": "ZJ014029",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8888152241706848
+      },
+      {
+        "id": "ZJ006097",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9764118194580078
+      },
+      {
+        "id": "ZJ012267",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9719852805137634
+      },
+      {
+        "id": "ZJ016104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9007395505905151
+      },
+      {
+        "id": "ZJ003307",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "rodent",
+        "probability": 0.8760773539543152
+      },
+      {
+        "id": "ZJ009335",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7675479054450989
+      },
+      {
+        "id": "ZJ014256",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5318719744682312
+      },
+      {
+        "id": "ZJ005260",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.8776863217353821
+      },
+      {
+        "id": "ZJ009497",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.9861069917678833
+      },
+      {
+        "id": "ZJ015860",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.8523463010787964
+      },
+      {
+        "id": "ZJ005465",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9973242282867432
+      },
+      {
+        "id": "ZJ008922",
+        "true_label": "leopard",
+        "predicted_label": "hog",
+        "probability": 0.9997259974479675
+      },
+      {
+        "id": "ZJ004932",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9683815240859985
+      },
+      {
+        "id": "ZJ008841",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8141267895698547
+      },
+      {
+        "id": "ZJ003962",
+        "true_label": "hog",
+        "predicted_label": "blank",
+        "probability": 0.43166083097457886
+      },
+      {
+        "id": "ZJ009671",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.5397658944129944
+      },
+      {
+        "id": "ZJ011873",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9691407680511475
+      },
+      {
+        "id": "ZJ013547",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.6646237373352051
+      },
+      {
+        "id": "ZJ003467",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.6247404217720032
+      },
+      {
+        "id": "ZJ001512",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.826740562915802
+      },
+      {
+        "id": "ZJ007793",
+        "true_label": "civet_genet",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7642473578453064
+      },
+      {
+        "id": "ZJ008624",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.4745993912220001
+      },
+      {
+        "id": "ZJ000534",
+        "true_label": "leopard",
+        "predicted_label": "hog",
+        "probability": 0.892382800579071
+      },
+      {
+        "id": "ZJ011844",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.8352567553520203
+      },
+      {
+        "id": "ZJ002572",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8597103357315063
+      },
+      {
+        "id": "ZJ008523",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6206851601600647
+      },
+      {
+        "id": "ZJ014588",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8179111480712891
+      },
+      {
+        "id": "ZJ001105",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8273459076881409
+      },
+      {
+        "id": "ZJ003096",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5792926549911499
+      },
+      {
+        "id": "ZJ000351",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6825407147407532
+      },
+      {
+        "id": "ZJ010209",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.6049036383628845
+      },
+      {
+        "id": "ZJ006636",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.9881529211997986
+      },
+      {
+        "id": "ZJ008083",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9994868040084839
+      },
+      {
+        "id": "ZJ007054",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.6764612197875977
+      },
+      {
+        "id": "ZJ010282",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9036727547645569
+      },
+      {
+        "id": "ZJ009258",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.729717493057251
+      },
+      {
+        "id": "ZJ000857",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9730038642883301
+      },
+      {
+        "id": "ZJ008058",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7145834565162659
+      },
+      {
+        "id": "ZJ014817",
+        "true_label": "blank",
+        "predicted_label": "hog",
+        "probability": 0.5879086852073669
+      },
+      {
+        "id": "ZJ012822",
+        "true_label": "leopard",
+        "predicted_label": "hog",
+        "probability": 0.8282526135444641
+      },
+      {
+        "id": "ZJ009429",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8398699164390564
+      },
+      {
+        "id": "ZJ000141",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8401736617088318
+      },
+      {
+        "id": "ZJ003600",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7610107064247131
+      },
+      {
+        "id": "ZJ003074",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.48304757475852966
+      },
+      {
+        "id": "ZJ007599",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.43541574478149414
+      },
+      {
+        "id": "ZJ012757",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.37090808153152466
+      },
+      {
+        "id": "ZJ009895",
+        "true_label": "leopard",
+        "predicted_label": "bird",
+        "probability": 0.9903604984283447
+      },
+      {
+        "id": "ZJ007200",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8747301697731018
+      },
+      {
+        "id": "ZJ015622",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8764278888702393
+      },
+      {
+        "id": "ZJ012208",
+        "true_label": "antelope_duiker",
+        "predicted_label": "hog",
+        "probability": 0.9781620502471924
+      },
+      {
+        "id": "ZJ010304",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.7902880311012268
+      },
+      {
+        "id": "ZJ006609",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6407197713851929
+      },
+      {
+        "id": "ZJ007838",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8258692026138306
+      },
+      {
+        "id": "ZJ008530",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.996067225933075
+      },
+      {
+        "id": "ZJ012704",
+        "true_label": "antelope_duiker",
+        "predicted_label": "bird",
+        "probability": 0.39943408966064453
+      },
+      {
+        "id": "ZJ008130",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.6686813831329346
+      },
+      {
+        "id": "ZJ011085",
+        "true_label": "antelope_duiker",
+        "predicted_label": "hog",
+        "probability": 0.8007185459136963
+      },
+      {
+        "id": "ZJ005344",
+        "true_label": "antelope_duiker",
+        "predicted_label": "bird",
+        "probability": 0.7017865777015686
+      },
+      {
+        "id": "ZJ008776",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9656906723976135
+      },
+      {
+        "id": "ZJ015052",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "bird",
+        "probability": 0.9666343927383423
+      },
+      {
+        "id": "ZJ015931",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.9335902333259583
+      },
+      {
+        "id": "ZJ001241",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.6778740882873535
+      },
+      {
+        "id": "ZJ003782",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6552022695541382
+      },
+      {
+        "id": "ZJ002721",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.41677430272102356
+      },
+      {
+        "id": "ZJ010287",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5720764994621277
+      },
+      {
+        "id": "ZJ001518",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.8923869729042053
+      },
+      {
+        "id": "ZJ006498",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.979528546333313
+      },
+      {
+        "id": "ZJ009966",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8476317524909973
+      },
+      {
+        "id": "ZJ004887",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.6610831022262573
+      },
+      {
+        "id": "ZJ008258",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.7711250185966492
+      },
+      {
+        "id": "ZJ003012",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.965563952922821
+      },
+      {
+        "id": "ZJ002104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.7936120629310608
+      },
+      {
+        "id": "ZJ002657",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9176380038261414
+      },
+      {
+        "id": "ZJ004676",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "leopard",
+        "probability": 0.8792539238929749
+      },
+      {
+        "id": "ZJ010262",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "bird",
+        "probability": 0.6626875400543213
+      },
+      {
+        "id": "ZJ004106",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8721119165420532
+      },
+      {
+        "id": "ZJ002365",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.4355689287185669
+      },
+      {
+        "id": "ZJ010813",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.7789214253425598
+      },
+      {
+        "id": "ZJ008497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9394387006759644
+      },
+      {
+        "id": "ZJ000676",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.8832693696022034
+      },
+      {
+        "id": "ZJ015571",
+        "true_label": "blank",
+        "predicted_label": "hog",
+        "probability": 0.7038803696632385
+      },
+      {
+        "id": "ZJ007556",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.4711483120918274
+      },
+      {
+        "id": "ZJ013619",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9137905240058899
+      },
+      {
+        "id": "ZJ010943",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.39827048778533936
+      },
+      {
+        "id": "ZJ010636",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.7394992709159851
+      },
+      {
+        "id": "ZJ010028",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.6845563650131226
+      },
+      {
+        "id": "ZJ011808",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.5684348940849304
+      },
+      {
+        "id": "ZJ003564",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.424648642539978
+      },
+      {
+        "id": "ZJ002215",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9860491156578064
+      },
+      {
+        "id": "ZJ003417",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.9420461058616638
+      }
+    ],
+    "log_loss": 0.37599599007739265,
+    "top3_accuracy": 0.9890909090909091,
+    "class_confidences": {
+      "antelope_duiker": 0.9038329689252761,
+      "bird": 0.9717825258479399,
+      "blank": 0.8450690146822196,
+      "civet_genet": 0.9724602897127136,
+      "hog": 0.9694799369031732,
+      "leopard": 0.9817130385188881,
+      "monkey_prosimian": 0.953483439183661,
+      "rodent": 0.8969686879561498
+    },
+    "macro_precision": 0.8873382287131297,
+    "macro_recall": 0.8976919664511025,
+    "macro_f1": 0.8910476107510076,
+    "micro_precision": 0.8884848484848484,
+    "micro_recall": 0.8884848484848484,
+    "micro_f1": 0.8884848484848484,
+    "weighted_precision": 0.8898795594411059,
+    "weighted_recall": 0.8884848484848484,
+    "weighted_f1": 0.8878652013562733,
+    "epoch": 2,
+    "lr_before": 9.045084971874737e-05,
+    "lr_after": 7.938926261462366e-05,
+    "class_f1s": {
+      "antelope_duiker": 0.8387096774193549,
+      "bird": 0.9221556886227545,
+      "blank": 0.7162790697674418,
+      "civet_genet": 0.9583333333333334,
+      "hog": 0.9230769230769231,
+      "leopard": 0.963963963963964,
+      "monkey_prosimian": 0.9067796610169492,
+      "rodent": 0.8990825688073395
+    },
+    "class_precisions": {
+      "antelope_duiker": 0.8387096774193549,
+      "bird": 0.9058823529411765,
+      "blank": 0.7403846153846154,
+      "civet_genet": 0.9663865546218487,
+      "hog": 0.8727272727272727,
+      "leopard": 0.981651376146789,
+      "monkey_prosimian": 0.9553571428571429,
+      "rodent": 0.8376068376068376
+    },
+    "class_recalls": {
+      "antelope_duiker": 0.8387096774193549,
+      "bird": 0.9390243902439024,
+      "blank": 0.6936936936936937,
+      "civet_genet": 0.9504132231404959,
+      "hog": 0.9795918367346939,
+      "leopard": 0.9469026548672567,
+      "monkey_prosimian": 0.8629032258064516,
+      "rodent": 0.9702970297029703
+    }
+  },
+  {
+    "antelope_duiker": {
+      "precision": 0.860655737704918,
+      "recall": 0.8467741935483871,
+      "f1-score": 0.8536585365853658,
+      "support": 124.0
+    },
+    "bird": {
+      "precision": 0.9736842105263158,
+      "recall": 0.9024390243902439,
+      "f1-score": 0.9367088607594937,
+      "support": 82.0
+    },
+    "blank": {
+      "precision": 0.7524752475247525,
+      "recall": 0.6846846846846847,
+      "f1-score": 0.7169811320754716,
+      "support": 111.0
+    },
+    "civet_genet": {
+      "precision": 0.9666666666666667,
+      "recall": 0.9586776859504132,
+      "f1-score": 0.9626556016597511,
+      "support": 121.0
+    },
+    "hog": {
+      "precision": 0.98,
+      "recall": 1.0,
+      "f1-score": 0.98989898989899,
+      "support": 49.0
+    },
+    "leopard": {
+      "precision": 0.9823008849557522,
+      "recall": 0.9823008849557522,
+      "f1-score": 0.9823008849557522,
+      "support": 113.0
+    },
+    "monkey_prosimian": {
+      "precision": 0.9133858267716536,
+      "recall": 0.9354838709677419,
+      "f1-score": 0.9243027888446215,
+      "support": 124.0
+    },
+    "rodent": {
+      "precision": 0.8448275862068966,
+      "recall": 0.9702970297029703,
+      "f1-score": 0.9032258064516129,
+      "support": 101.0
+    },
+    "accuracy": 0.9030303030303031,
+    "macro avg": {
+      "precision": 0.9092495200446193,
+      "recall": 0.9100821717750243,
+      "f1-score": 0.9087165751538824,
+      "support": 825.0
+    },
+    "weighted avg": {
+      "precision": 0.9026209267964407,
+      "recall": 0.9030303030303031,
+      "f1-score": 0.9019083895193546,
+      "support": 825.0
+    },
+    "confusion_matrix": [
+      [
+        105,
+        0,
+        11,
+        1,
+        0,
+        0,
+        4,
+        3
+      ],
+      [
+        1,
+        74,
+        3,
+        0,
+        0,
+        0,
+        2,
+        2
+      ],
+      [
+        12,
+        2,
+        76,
+        2,
+        1,
+        2,
+        5,
+        11
+      ],
+      [
+        2,
+        0,
+        1,
+        116,
+        0,
+        0,
+        0,
+        2
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        49,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        2,
+        0,
+        0,
+        111,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        6,
+        0,
+        0,
+        0,
+        116,
+        0
+      ],
+      [
+        0,
+        0,
+        2,
+        1,
+        0,
+        0,
+        0,
+        98
+      ]
+    ],
+    "loss": 0.3446056631117156,
+    "acc": 0.9030303030303031,
+    "misclassified_images": [
+      {
+        "id": "ZJ001248",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.5579960346221924
+      },
+      {
+        "id": "ZJ007603",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9183837175369263
+      },
+      {
+        "id": "ZJ008586",
+        "true_label": "rodent",
+        "predicted_label": "civet_genet",
+        "probability": 0.5766190886497498
+      },
+      {
+        "id": "ZJ014029",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8987916707992554
+      },
+      {
+        "id": "ZJ006097",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9411689639091492
+      },
+      {
+        "id": "ZJ012267",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9806538224220276
+      },
+      {
+        "id": "ZJ016104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9587833881378174
+      },
+      {
+        "id": "ZJ010189",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8273168206214905
+      },
+      {
+        "id": "ZJ016211",
+        "true_label": "civet_genet",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8713694214820862
+      },
+      {
+        "id": "ZJ014256",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.48789188265800476
+      },
+      {
+        "id": "ZJ005260",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.9782625436782837
+      },
+      {
+        "id": "ZJ009497",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.998506486415863
+      },
+      {
+        "id": "ZJ015860",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9179670810699463
+      },
+      {
+        "id": "ZJ005465",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9991546869277954
+      },
+      {
+        "id": "ZJ008922",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.7254401445388794
+      },
+      {
+        "id": "ZJ004932",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9843878746032715
+      },
+      {
+        "id": "ZJ008841",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7538739442825317
+      },
+      {
+        "id": "ZJ001170",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.7155462503433228
+      },
+      {
+        "id": "ZJ009715",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5738072991371155
+      },
+      {
+        "id": "ZJ011873",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.547545313835144
+      },
+      {
+        "id": "ZJ008730",
+        "true_label": "blank",
+        "predicted_label": "hog",
+        "probability": 0.714394211769104
+      },
+      {
+        "id": "ZJ013547",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.902527928352356
+      },
+      {
+        "id": "ZJ003467",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8759269714355469
+      },
+      {
+        "id": "ZJ001512",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.8570058345794678
+      },
+      {
+        "id": "ZJ007793",
+        "true_label": "civet_genet",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.552117645740509
+      },
+      {
+        "id": "ZJ011844",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.90097576379776
+      },
+      {
+        "id": "ZJ008322",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9749635457992554
+      },
+      {
+        "id": "ZJ000140",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.7231338024139404
+      },
+      {
+        "id": "ZJ002572",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6134771704673767
+      },
+      {
+        "id": "ZJ007791",
+        "true_label": "bird",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.8625512719154358
+      },
+      {
+        "id": "ZJ008523",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.534266471862793
+      },
+      {
+        "id": "ZJ000298",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.607427179813385
+      },
+      {
+        "id": "ZJ014588",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5847790837287903
+      },
+      {
+        "id": "ZJ001105",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.5776498317718506
+      },
+      {
+        "id": "ZJ000351",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7645130753517151
+      },
+      {
+        "id": "ZJ005980",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5323454737663269
+      },
+      {
+        "id": "ZJ006636",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.9899622201919556
+      },
+      {
+        "id": "ZJ008083",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9995619654655457
+      },
+      {
+        "id": "ZJ010282",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9177342057228088
+      },
+      {
+        "id": "ZJ000857",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9921488761901855
+      },
+      {
+        "id": "ZJ000141",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8963470458984375
+      },
+      {
+        "id": "ZJ003074",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5116329789161682
+      },
+      {
+        "id": "ZJ002473",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.4332785904407501
+      },
+      {
+        "id": "ZJ005911",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8527382612228394
+      },
+      {
+        "id": "ZJ003729",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.5333588719367981
+      },
+      {
+        "id": "ZJ007200",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9258666038513184
+      },
+      {
+        "id": "ZJ010304",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.6340157389640808
+      },
+      {
+        "id": "ZJ006609",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.49296513199806213
+      },
+      {
+        "id": "ZJ007838",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9687891006469727
+      },
+      {
+        "id": "ZJ006328",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5412112474441528
+      },
+      {
+        "id": "ZJ008530",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9982401132583618
+      },
+      {
+        "id": "ZJ012704",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.760763943195343
+      },
+      {
+        "id": "ZJ005344",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6838263869285583
+      },
+      {
+        "id": "ZJ008776",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9220365285873413
+      },
+      {
+        "id": "ZJ008122",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.7186244130134583
+      },
+      {
+        "id": "ZJ015931",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.9686728119850159
+      },
+      {
+        "id": "ZJ001241",
+        "true_label": "bird",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.4250524342060089
+      },
+      {
+        "id": "ZJ010928",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7988412380218506
+      },
+      {
+        "id": "ZJ010287",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6019862294197083
+      },
+      {
+        "id": "ZJ001518",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.9832367300987244
+      },
+      {
+        "id": "ZJ006498",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9708261489868164
+      },
+      {
+        "id": "ZJ014641",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9887266755104065
+      },
+      {
+        "id": "ZJ009966",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8233880400657654
+      },
+      {
+        "id": "ZJ004887",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9908024072647095
+      },
+      {
+        "id": "ZJ003012",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9954224228858948
+      },
+      {
+        "id": "ZJ002104",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6171886324882507
+      },
+      {
+        "id": "ZJ002657",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9790571928024292
+      },
+      {
+        "id": "ZJ008591",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9418715834617615
+      },
+      {
+        "id": "ZJ009425",
+        "true_label": "bird",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9542036056518555
+      },
+      {
+        "id": "ZJ004106",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9617166519165039
+      },
+      {
+        "id": "ZJ000518",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.5651766061782837
+      },
+      {
+        "id": "ZJ008497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7679085731506348
+      },
+      {
+        "id": "ZJ000676",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.8598752021789551
+      },
+      {
+        "id": "ZJ013619",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.961754322052002
+      },
+      {
+        "id": "ZJ012273",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.5142926573753357
+      },
+      {
+        "id": "ZJ010636",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8883793950080872
+      },
+      {
+        "id": "ZJ010028",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.5522316694259644
+      },
+      {
+        "id": "ZJ003564",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.6198875904083252
+      },
+      {
+        "id": "ZJ002215",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.999118983745575
+      },
+      {
+        "id": "ZJ003417",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.9724491834640503
+      }
+    ],
+    "log_loss": 0.34460566945966453,
+    "top3_accuracy": 0.9878787878787879,
+    "class_confidences": {
+      "antelope_duiker": 0.9407673067733889,
+      "bird": 0.9876125156879425,
+      "blank": 0.8634649482694002,
+      "civet_genet": 0.9836644132932028,
+      "hog": 0.9863398158550263,
+      "leopard": 0.9808803179622752,
+      "monkey_prosimian": 0.9641987747094762,
+      "rodent": 0.9396138222053133
+    },
+    "macro_precision": 0.9092495200446193,
+    "macro_recall": 0.9100821717750243,
+    "macro_f1": 0.9087165751538824,
+    "micro_precision": 0.9030303030303031,
+    "micro_recall": 0.9030303030303031,
+    "micro_f1": 0.9030303030303031,
+    "weighted_precision": 0.9026209267964407,
+    "weighted_recall": 0.9030303030303031,
+    "weighted_f1": 0.9019083895193546,
+    "epoch": 3,
+    "lr_before": 7.938926261462366e-05,
+    "lr_after": 6.545084971874737e-05,
+    "class_f1s": {
+      "antelope_duiker": 0.8536585365853658,
+      "bird": 0.9367088607594937,
+      "blank": 0.7169811320754716,
+      "civet_genet": 0.9626556016597511,
+      "hog": 0.98989898989899,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.9243027888446215,
+      "rodent": 0.9032258064516129
+    },
+    "class_precisions": {
+      "antelope_duiker": 0.860655737704918,
+      "bird": 0.9736842105263158,
+      "blank": 0.7524752475247525,
+      "civet_genet": 0.9666666666666667,
+      "hog": 0.98,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.9133858267716536,
+      "rodent": 0.8448275862068966
+    },
+    "class_recalls": {
+      "antelope_duiker": 0.8467741935483871,
+      "bird": 0.9024390243902439,
+      "blank": 0.6846846846846847,
+      "civet_genet": 0.9586776859504132,
+      "hog": 1.0,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.9354838709677419,
+      "rodent": 0.9702970297029703
+    }
+  },
+  {
+    "antelope_duiker": {
+      "precision": 0.8709677419354839,
+      "recall": 0.8709677419354839,
+      "f1-score": 0.8709677419354839,
+      "support": 124.0
+    },
+    "bird": {
+      "precision": 0.9512195121951219,
+      "recall": 0.9512195121951219,
+      "f1-score": 0.9512195121951219,
+      "support": 82.0
+    },
+    "blank": {
+      "precision": 0.81,
+      "recall": 0.7297297297297297,
+      "f1-score": 0.7677725118483413,
+      "support": 111.0
+    },
+    "civet_genet": {
+      "precision": 0.9752066115702479,
+      "recall": 0.9752066115702479,
+      "f1-score": 0.9752066115702479,
+      "support": 121.0
+    },
+    "hog": {
+      "precision": 1.0,
+      "recall": 0.9795918367346939,
+      "f1-score": 0.9896907216494846,
+      "support": 49.0
+    },
+    "leopard": {
+      "precision": 0.9736842105263158,
+      "recall": 0.9823008849557522,
+      "f1-score": 0.9779735682819384,
+      "support": 113.0
+    },
+    "monkey_prosimian": {
+      "precision": 0.928,
+      "recall": 0.9354838709677419,
+      "f1-score": 0.9317269076305221,
+      "support": 124.0
+    },
+    "rodent": {
+      "precision": 0.9009009009009009,
+      "recall": 0.9900990099009901,
+      "f1-score": 0.9433962264150944,
+      "support": 101.0
+    },
+    "accuracy": 0.9212121212121213,
+    "macro avg": {
+      "precision": 0.9262473721410088,
+      "recall": 0.9268248997487202,
+      "f1-score": 0.9259942251907793,
+      "support": 825.0
+    },
+    "weighted avg": {
+      "precision": 0.9199991597338967,
+      "recall": 0.9212121212121213,
+      "f1-score": 0.920055470067829,
+      "support": 825.0
+    },
+    "confusion_matrix": [
+      [
+        108,
+        0,
+        9,
+        1,
+        0,
+        0,
+        4,
+        2
+      ],
+      [
+        0,
+        78,
+        3,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        10,
+        4,
+        81,
+        2,
+        0,
+        2,
+        5,
+        7
+      ],
+      [
+        0,
+        0,
+        1,
+        118,
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        48,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        1,
+        0,
+        0,
+        111,
+        0,
+        0
+      ],
+      [
+        5,
+        0,
+        3,
+        0,
+        0,
+        0,
+        116,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        100
+      ]
+    ],
+    "loss": 0.33427075682264384,
+    "acc": 0.9212121212121213,
+    "misclassified_images": [
+      {
+        "id": "ZJ001248",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.9893388152122498
+      },
+      {
+        "id": "ZJ007603",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8429333567619324
+      },
+      {
+        "id": "ZJ005755",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8930609226226807
+      },
+      {
+        "id": "ZJ006097",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9837198257446289
+      },
+      {
+        "id": "ZJ012267",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9973956346511841
+      },
+      {
+        "id": "ZJ016104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9879390001296997
+      },
+      {
+        "id": "ZJ004287",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.5266653299331665
+      },
+      {
+        "id": "ZJ015741",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5163247585296631
+      },
+      {
+        "id": "ZJ014256",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.719785213470459
+      },
+      {
+        "id": "ZJ005260",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.9345000386238098
+      },
+      {
+        "id": "ZJ009497",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.9995947480201721
+      },
+      {
+        "id": "ZJ015860",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9727161526679993
+      },
+      {
+        "id": "ZJ005465",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999129772186279
+      },
+      {
+        "id": "ZJ004932",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.990328848361969
+      },
+      {
+        "id": "ZJ008841",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9907167553901672
+      },
+      {
+        "id": "ZJ003962",
+        "true_label": "hog",
+        "predicted_label": "blank",
+        "probability": 0.6433039903640747
+      },
+      {
+        "id": "ZJ009715",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8560290336608887
+      },
+      {
+        "id": "ZJ001018",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7838969230651855
+      },
+      {
+        "id": "ZJ013547",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9795188307762146
+      },
+      {
+        "id": "ZJ003467",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.7316085696220398
+      },
+      {
+        "id": "ZJ011264",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.8652624487876892
+      },
+      {
+        "id": "ZJ001512",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.8616591095924377
+      },
+      {
+        "id": "ZJ007793",
+        "true_label": "civet_genet",
+        "predicted_label": "leopard",
+        "probability": 0.8537417650222778
+      },
+      {
+        "id": "ZJ011844",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9946287274360657
+      },
+      {
+        "id": "ZJ000140",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.481840044260025
+      },
+      {
+        "id": "ZJ002572",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9002193808555603
+      },
+      {
+        "id": "ZJ008523",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.48251643776893616
+      },
+      {
+        "id": "ZJ000298",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5553833246231079
+      },
+      {
+        "id": "ZJ001105",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8989874124526978
+      },
+      {
+        "id": "ZJ000351",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5382539629936218
+      },
+      {
+        "id": "ZJ008083",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999061822891235
+      },
+      {
+        "id": "ZJ010282",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9307783246040344
+      },
+      {
+        "id": "ZJ000857",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9941493272781372
+      },
+      {
+        "id": "ZJ009429",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.625749409198761
+      },
+      {
+        "id": "ZJ000141",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.7466757893562317
+      },
+      {
+        "id": "ZJ013356",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9800114631652832
+      },
+      {
+        "id": "ZJ007200",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8609453439712524
+      },
+      {
+        "id": "ZJ015622",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7245581150054932
+      },
+      {
+        "id": "ZJ010304",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.9470672011375427
+      },
+      {
+        "id": "ZJ006609",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.5882977247238159
+      },
+      {
+        "id": "ZJ007838",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8554790616035461
+      },
+      {
+        "id": "ZJ008530",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9981855750083923
+      },
+      {
+        "id": "ZJ005344",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6996434330940247
+      },
+      {
+        "id": "ZJ008776",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.7299233675003052
+      },
+      {
+        "id": "ZJ015931",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.9123842120170593
+      },
+      {
+        "id": "ZJ001241",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9220175743103027
+      },
+      {
+        "id": "ZJ010287",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.4968195855617523
+      },
+      {
+        "id": "ZJ001518",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.9966962337493896
+      },
+      {
+        "id": "ZJ010326",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.8886186480522156
+      },
+      {
+        "id": "ZJ006498",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9943102598190308
+      },
+      {
+        "id": "ZJ004887",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5361528992652893
+      },
+      {
+        "id": "ZJ003012",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9178066849708557
+      },
+      {
+        "id": "ZJ002104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.5035839676856995
+      },
+      {
+        "id": "ZJ002657",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.557548463344574
+      },
+      {
+        "id": "ZJ008591",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.8994220495223999
+      },
+      {
+        "id": "ZJ004106",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9863258004188538
+      },
+      {
+        "id": "ZJ008497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9972196817398071
+      },
+      {
+        "id": "ZJ000676",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.6187019348144531
+      },
+      {
+        "id": "ZJ007556",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.48117122054100037
+      },
+      {
+        "id": "ZJ013619",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.7056384086608887
+      },
+      {
+        "id": "ZJ010943",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.693390965461731
+      },
+      {
+        "id": "ZJ010636",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9699419736862183
+      },
+      {
+        "id": "ZJ000707",
+        "true_label": "leopard",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.879173994064331
+      },
+      {
+        "id": "ZJ002215",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.997033953666687
+      },
+      {
+        "id": "ZJ003417",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.9404149651527405
+      }
+    ],
+    "log_loss": 0.33427077998572846,
+    "top3_accuracy": 0.9890909090909091,
+    "class_confidences": {
+      "antelope_duiker": 0.9421072688794905,
+      "bird": 0.9773487532284202,
+      "blank": 0.8611792629957199,
+      "civet_genet": 0.9919727149088521,
+      "hog": 0.9851028000315031,
+      "leopard": 0.9825979633289471,
+      "monkey_prosimian": 0.960809594154358,
+      "rodent": 0.9640423526635041
+    },
+    "macro_precision": 0.9262473721410088,
+    "macro_recall": 0.9268248997487202,
+    "macro_f1": 0.9259942251907793,
+    "micro_precision": 0.9212121212121213,
+    "micro_recall": 0.9212121212121213,
+    "micro_f1": 0.9212121212121213,
+    "weighted_precision": 0.9199991597338967,
+    "weighted_recall": 0.9212121212121213,
+    "weighted_f1": 0.920055470067829,
+    "epoch": 4,
+    "lr_before": 6.545084971874737e-05,
+    "lr_after": 4.9999999999999996e-05,
+    "class_f1s": {
+      "antelope_duiker": 0.8709677419354839,
+      "bird": 0.9512195121951219,
+      "blank": 0.7677725118483413,
+      "civet_genet": 0.9752066115702479,
+      "hog": 0.9896907216494846,
+      "leopard": 0.9779735682819384,
+      "monkey_prosimian": 0.9317269076305221,
+      "rodent": 0.9433962264150944
+    },
+    "class_precisions": {
+      "antelope_duiker": 0.8709677419354839,
+      "bird": 0.9512195121951219,
+      "blank": 0.81,
+      "civet_genet": 0.9752066115702479,
+      "hog": 1.0,
+      "leopard": 0.9736842105263158,
+      "monkey_prosimian": 0.928,
+      "rodent": 0.9009009009009009
+    },
+    "class_recalls": {
+      "antelope_duiker": 0.8709677419354839,
+      "bird": 0.9512195121951219,
+      "blank": 0.7297297297297297,
+      "civet_genet": 0.9752066115702479,
+      "hog": 0.9795918367346939,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.9354838709677419,
+      "rodent": 0.9900990099009901
+    }
+  },
+  {
+    "antelope_duiker": {
+      "precision": 0.8717948717948718,
+      "recall": 0.8225806451612904,
+      "f1-score": 0.8464730290456431,
+      "support": 124.0
+    },
+    "bird": {
+      "precision": 0.9382716049382716,
+      "recall": 0.926829268292683,
+      "f1-score": 0.9325153374233128,
+      "support": 82.0
+    },
+    "blank": {
+      "precision": 0.7735849056603774,
+      "recall": 0.7387387387387387,
+      "f1-score": 0.7557603686635944,
+      "support": 111.0
+    },
+    "civet_genet": {
+      "precision": 0.975,
+      "recall": 0.9669421487603306,
+      "f1-score": 0.970954356846473,
+      "support": 121.0
+    },
+    "hog": {
+      "precision": 1.0,
+      "recall": 0.9183673469387755,
+      "f1-score": 0.9574468085106383,
+      "support": 49.0
+    },
+    "leopard": {
+      "precision": 0.9823008849557522,
+      "recall": 0.9823008849557522,
+      "f1-score": 0.9823008849557522,
+      "support": 113.0
+    },
+    "monkey_prosimian": {
+      "precision": 0.8778625954198473,
+      "recall": 0.9274193548387096,
+      "f1-score": 0.9019607843137255,
+      "support": 124.0
+    },
+    "rodent": {
+      "precision": 0.875,
+      "recall": 0.9702970297029703,
+      "f1-score": 0.92018779342723,
+      "support": 101.0
+    },
+    "accuracy": 0.9042424242424243,
+    "macro avg": {
+      "precision": 0.91172685784614,
+      "recall": 0.9066844271736563,
+      "f1-score": 0.9084499203982962,
+      "support": 825.0
+    },
+    "weighted avg": {
+      "precision": 0.9043802691731702,
+      "recall": 0.9042424242424243,
+      "f1-score": 0.9036373204588207,
+      "support": 825.0
+    },
+    "confusion_matrix": [
+      [
+        102,
+        0,
+        8,
+        1,
+        0,
+        0,
+        11,
+        2
+      ],
+      [
+        0,
+        76,
+        5,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        9,
+        4,
+        82,
+        2,
+        0,
+        2,
+        3,
+        9
+      ],
+      [
+        1,
+        0,
+        1,
+        117,
+        0,
+        0,
+        0,
+        2
+      ],
+      [
+        4,
+        0,
+        0,
+        0,
+        45,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        111,
+        2,
+        0
+      ],
+      [
+        1,
+        1,
+        7,
+        0,
+        0,
+        0,
+        115,
+        0
+      ],
+      [
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        98
+      ]
+    ],
+    "loss": 0.3914005552638661,
+    "acc": 0.9042424242424243,
+    "misclassified_images": [
+      {
+        "id": "ZJ009800",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "bird",
+        "probability": 0.9877897500991821
+      },
+      {
+        "id": "ZJ001248",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.9720028042793274
+      },
+      {
+        "id": "ZJ007603",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.992979109287262
+      },
+      {
+        "id": "ZJ012900",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5783270597457886
+      },
+      {
+        "id": "ZJ003937",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.3293328881263733
+      },
+      {
+        "id": "ZJ006097",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.954204797744751
+      },
+      {
+        "id": "ZJ012267",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9967488050460815
+      },
+      {
+        "id": "ZJ016104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8736236691474915
+      },
+      {
+        "id": "ZJ004287",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6979656219482422
+      },
+      {
+        "id": "ZJ015741",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.7539334893226624
+      },
+      {
+        "id": "ZJ010189",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.4645998775959015
+      },
+      {
+        "id": "ZJ014256",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5940405130386353
+      },
+      {
+        "id": "ZJ005260",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.764063835144043
+      },
+      {
+        "id": "ZJ009497",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.9984923601150513
+      },
+      {
+        "id": "ZJ014647",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.5608789920806885
+      },
+      {
+        "id": "ZJ015860",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9757887721061707
+      },
+      {
+        "id": "ZJ005465",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999797344207764
+      },
+      {
+        "id": "ZJ004932",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9996116757392883
+      },
+      {
+        "id": "ZJ001170",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.34167879819869995
+      },
+      {
+        "id": "ZJ001018",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9020026326179504
+      },
+      {
+        "id": "ZJ013547",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9872180819511414
+      },
+      {
+        "id": "ZJ003467",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.6793769598007202
+      },
+      {
+        "id": "ZJ001512",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.9461819529533386
+      },
+      {
+        "id": "ZJ007793",
+        "true_label": "civet_genet",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.4154014587402344
+      },
+      {
+        "id": "ZJ008621",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9570545554161072
+      },
+      {
+        "id": "ZJ011844",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9976785778999329
+      },
+      {
+        "id": "ZJ008322",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.7807386517524719
+      },
+      {
+        "id": "ZJ000140",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9918234944343567
+      },
+      {
+        "id": "ZJ002572",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9806658625602722
+      },
+      {
+        "id": "ZJ014446",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9134394526481628
+      },
+      {
+        "id": "ZJ001105",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9814696311950684
+      },
+      {
+        "id": "ZJ007384",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.5330044031143188
+      },
+      {
+        "id": "ZJ008083",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999793767929077
+      },
+      {
+        "id": "ZJ010282",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9523729681968689
+      },
+      {
+        "id": "ZJ000857",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9928539395332336
+      },
+      {
+        "id": "ZJ000141",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.983391284942627
+      },
+      {
+        "id": "ZJ005911",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.4796556234359741
+      },
+      {
+        "id": "ZJ005880",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9997161030769348
+      },
+      {
+        "id": "ZJ009895",
+        "true_label": "leopard",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.5160192847251892
+      },
+      {
+        "id": "ZJ002386",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.628978431224823
+      },
+      {
+        "id": "ZJ007200",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9627284407615662
+      },
+      {
+        "id": "ZJ015622",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9742253422737122
+      },
+      {
+        "id": "ZJ010304",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.9811214208602905
+      },
+      {
+        "id": "ZJ006609",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.4554481506347656
+      },
+      {
+        "id": "ZJ007838",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8891605138778687
+      },
+      {
+        "id": "ZJ008530",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9804584980010986
+      },
+      {
+        "id": "ZJ008776",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9000535607337952
+      },
+      {
+        "id": "ZJ002581",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.5932116508483887
+      },
+      {
+        "id": "ZJ012004",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.3856988847255707
+      },
+      {
+        "id": "ZJ008122",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.855381965637207
+      },
+      {
+        "id": "ZJ001241",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.7477476000785828
+      },
+      {
+        "id": "ZJ010287",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5664589405059814
+      },
+      {
+        "id": "ZJ001518",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.9920135140419006
+      },
+      {
+        "id": "ZJ010326",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9991074204444885
+      },
+      {
+        "id": "ZJ006498",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9980712532997131
+      },
+      {
+        "id": "ZJ004887",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.726649820804596
+      },
+      {
+        "id": "ZJ013571",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.640708327293396
+      },
+      {
+        "id": "ZJ008258",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.9539850354194641
+      },
+      {
+        "id": "ZJ003012",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9732527136802673
+      },
+      {
+        "id": "ZJ002104",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9781458377838135
+      },
+      {
+        "id": "ZJ002657",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9695466756820679
+      },
+      {
+        "id": "ZJ008591",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.88144451379776
+      },
+      {
+        "id": "ZJ004106",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9613860845565796
+      },
+      {
+        "id": "ZJ010748",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.5237011313438416
+      },
+      {
+        "id": "ZJ001350",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.538339376449585
+      },
+      {
+        "id": "ZJ008497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.7385159134864807
+      },
+      {
+        "id": "ZJ002745",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.5046718716621399
+      },
+      {
+        "id": "ZJ010364",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9715644717216492
+      },
+      {
+        "id": "ZJ000676",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.534210741519928
+      },
+      {
+        "id": "ZJ007556",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5516915321350098
+      },
+      {
+        "id": "ZJ013619",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9425060153007507
+      },
+      {
+        "id": "ZJ010943",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.6924670934677124
+      },
+      {
+        "id": "ZJ010636",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9777354001998901
+      },
+      {
+        "id": "ZJ004628",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8773998022079468
+      },
+      {
+        "id": "ZJ000707",
+        "true_label": "leopard",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.5805195569992065
+      },
+      {
+        "id": "ZJ006720",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8886539340019226
+      },
+      {
+        "id": "ZJ015703",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8902673125267029
+      },
+      {
+        "id": "ZJ002215",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.999873161315918
+      },
+      {
+        "id": "ZJ003417",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.9869381189346313
+      }
+    ],
+    "log_loss": 0.39140057752652063,
+    "top3_accuracy": 0.9878787878787879,
+    "class_confidences": {
+      "antelope_duiker": 0.9584436444645255,
+      "bird": 0.9882920575730595,
+      "blank": 0.8919260752088619,
+      "civet_genet": 0.993190095325311,
+      "hog": 0.9865142212973701,
+      "leopard": 0.9915728183974207,
+      "monkey_prosimian": 0.9584412597517931,
+      "rodent": 0.9578533300331661
+    },
+    "macro_precision": 0.91172685784614,
+    "macro_recall": 0.9066844271736563,
+    "macro_f1": 0.9084499203982962,
+    "micro_precision": 0.9042424242424243,
+    "micro_recall": 0.9042424242424243,
+    "micro_f1": 0.9042424242424243,
+    "weighted_precision": 0.9043802691731702,
+    "weighted_recall": 0.9042424242424243,
+    "weighted_f1": 0.9036373204588207,
+    "epoch": 5,
+    "lr_before": 4.9999999999999996e-05,
+    "lr_after": 3.454915028125263e-05,
+    "class_f1s": {
+      "antelope_duiker": 0.8464730290456431,
+      "bird": 0.9325153374233128,
+      "blank": 0.7557603686635944,
+      "civet_genet": 0.970954356846473,
+      "hog": 0.9574468085106383,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.9019607843137255,
+      "rodent": 0.92018779342723
+    },
+    "class_precisions": {
+      "antelope_duiker": 0.8717948717948718,
+      "bird": 0.9382716049382716,
+      "blank": 0.7735849056603774,
+      "civet_genet": 0.975,
+      "hog": 1.0,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.8778625954198473,
+      "rodent": 0.875
+    },
+    "class_recalls": {
+      "antelope_duiker": 0.8225806451612904,
+      "bird": 0.926829268292683,
+      "blank": 0.7387387387387387,
+      "civet_genet": 0.9669421487603306,
+      "hog": 0.9183673469387755,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.9274193548387096,
+      "rodent": 0.9702970297029703
+    }
+  },
+  {
+    "antelope_duiker": {
+      "precision": 0.8907563025210085,
+      "recall": 0.8548387096774194,
+      "f1-score": 0.8724279835390947,
+      "support": 124.0
+    },
+    "bird": {
+      "precision": 0.9404761904761905,
+      "recall": 0.9634146341463414,
+      "f1-score": 0.9518072289156626,
+      "support": 82.0
+    },
+    "blank": {
+      "precision": 0.7592592592592593,
+      "recall": 0.7387387387387387,
+      "f1-score": 0.7488584474885844,
+      "support": 111.0
+    },
+    "civet_genet": {
+      "precision": 0.9745762711864406,
+      "recall": 0.9504132231404959,
+      "f1-score": 0.9623430962343096,
+      "support": 121.0
+    },
+    "hog": {
+      "precision": 1.0,
+      "recall": 0.9591836734693877,
+      "f1-score": 0.9791666666666666,
+      "support": 49.0
+    },
+    "leopard": {
+      "precision": 0.9741379310344828,
+      "recall": 1.0,
+      "f1-score": 0.9868995633187773,
+      "support": 113.0
+    },
+    "monkey_prosimian": {
+      "precision": 0.9349593495934959,
+      "recall": 0.9274193548387096,
+      "f1-score": 0.9311740890688259,
+      "support": 124.0
+    },
+    "rodent": {
+      "precision": 0.8818181818181818,
+      "recall": 0.9603960396039604,
+      "f1-score": 0.919431279620853,
+      "support": 101.0
+    },
+    "accuracy": 0.9139393939393939,
+    "macro avg": {
+      "precision": 0.9194979357361324,
+      "recall": 0.9193005467018817,
+      "f1-score": 0.9190135443565968,
+      "support": 825.0
+    },
+    "weighted avg": {
+      "precision": 0.9137582032037773,
+      "recall": 0.9139393939393939,
+      "f1-score": 0.9134824589738734,
+      "support": 825.0
+    },
+    "confusion_matrix": [
+      [
+        106,
+        0,
+        10,
+        1,
+        0,
+        0,
+        5,
+        2
+      ],
+      [
+        0,
+        79,
+        2,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        9,
+        4,
+        82,
+        2,
+        0,
+        2,
+        3,
+        9
+      ],
+      [
+        0,
+        0,
+        4,
+        115,
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        47,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        113,
+        0,
+        0
+      ],
+      [
+        2,
+        1,
+        6,
+        0,
+        0,
+        0,
+        115,
+        0
+      ],
+      [
+        0,
+        0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        97
+      ]
+    ],
+    "loss": 0.3620179989121177,
+    "acc": 0.9139393939393939,
+    "misclassified_images": [
+      {
+        "id": "ZJ001248",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.8139169812202454
+      },
+      {
+        "id": "ZJ007603",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9991390705108643
+      },
+      {
+        "id": "ZJ012900",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7518343329429626
+      },
+      {
+        "id": "ZJ014029",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.7187855839729309
+      },
+      {
+        "id": "ZJ003937",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.5433258414268494
+      },
+      {
+        "id": "ZJ006097",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9681150913238525
+      },
+      {
+        "id": "ZJ012267",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9941911101341248
+      },
+      {
+        "id": "ZJ016104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.93939608335495
+      },
+      {
+        "id": "ZJ012780",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9534847140312195
+      },
+      {
+        "id": "ZJ005260",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.6466255784034729
+      },
+      {
+        "id": "ZJ009497",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.9988347887992859
+      },
+      {
+        "id": "ZJ015860",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9855092167854309
+      },
+      {
+        "id": "ZJ005465",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999696016311646
+      },
+      {
+        "id": "ZJ004932",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9245648384094238
+      },
+      {
+        "id": "ZJ008841",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7692494988441467
+      },
+      {
+        "id": "ZJ001240",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.4894547760486603
+      },
+      {
+        "id": "ZJ009715",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5540456771850586
+      },
+      {
+        "id": "ZJ013547",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.987713098526001
+      },
+      {
+        "id": "ZJ003467",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.4764239490032196
+      },
+      {
+        "id": "ZJ011264",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9812187552452087
+      },
+      {
+        "id": "ZJ001512",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.9954128861427307
+      },
+      {
+        "id": "ZJ007793",
+        "true_label": "civet_genet",
+        "predicted_label": "leopard",
+        "probability": 0.41611143946647644
+      },
+      {
+        "id": "ZJ011844",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9975023865699768
+      },
+      {
+        "id": "ZJ000140",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.935375452041626
+      },
+      {
+        "id": "ZJ002572",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8921756744384766
+      },
+      {
+        "id": "ZJ008523",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5236956477165222
+      },
+      {
+        "id": "ZJ000298",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8078277707099915
+      },
+      {
+        "id": "ZJ001105",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9874411821365356
+      },
+      {
+        "id": "ZJ007384",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.5105612277984619
+      },
+      {
+        "id": "ZJ000351",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8874611854553223
+      },
+      {
+        "id": "ZJ008083",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999641180038452
+      },
+      {
+        "id": "ZJ010282",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.984491765499115
+      },
+      {
+        "id": "ZJ000857",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.997005045413971
+      },
+      {
+        "id": "ZJ008058",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5850136280059814
+      },
+      {
+        "id": "ZJ000141",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9526398181915283
+      },
+      {
+        "id": "ZJ015556",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.4131980538368225
+      },
+      {
+        "id": "ZJ003279",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.5258288979530334
+      },
+      {
+        "id": "ZJ002473",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.5396775007247925
+      },
+      {
+        "id": "ZJ005911",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7095986008644104
+      },
+      {
+        "id": "ZJ005880",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7346264123916626
+      },
+      {
+        "id": "ZJ009342",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.5036652684211731
+      },
+      {
+        "id": "ZJ002386",
+        "true_label": "civet_genet",
+        "predicted_label": "rodent",
+        "probability": 0.6652240753173828
+      },
+      {
+        "id": "ZJ007200",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9662086367607117
+      },
+      {
+        "id": "ZJ010304",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.9971996545791626
+      },
+      {
+        "id": "ZJ006609",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8807380199432373
+      },
+      {
+        "id": "ZJ007838",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9606314897537231
+      },
+      {
+        "id": "ZJ008530",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.998121440410614
+      },
+      {
+        "id": "ZJ005344",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.709921658039093
+      },
+      {
+        "id": "ZJ008776",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.7611492276191711
+      },
+      {
+        "id": "ZJ002581",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.6837690472602844
+      },
+      {
+        "id": "ZJ015052",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "bird",
+        "probability": 0.8709587454795837
+      },
+      {
+        "id": "ZJ010287",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.4749132990837097
+      },
+      {
+        "id": "ZJ001518",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.8917614221572876
+      },
+      {
+        "id": "ZJ010326",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9869693517684937
+      },
+      {
+        "id": "ZJ006498",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9996192455291748
+      },
+      {
+        "id": "ZJ009966",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.7892016768455505
+      },
+      {
+        "id": "ZJ004887",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.3795250952243805
+      },
+      {
+        "id": "ZJ008258",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.9388463497161865
+      },
+      {
+        "id": "ZJ003012",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9538109302520752
+      },
+      {
+        "id": "ZJ002104",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9900429248809814
+      },
+      {
+        "id": "ZJ002657",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.997830331325531
+      },
+      {
+        "id": "ZJ004106",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9461576342582703
+      },
+      {
+        "id": "ZJ001339",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.7115304470062256
+      },
+      {
+        "id": "ZJ008497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5332710146903992
+      },
+      {
+        "id": "ZJ010364",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6437413096427917
+      },
+      {
+        "id": "ZJ013619",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9844833016395569
+      },
+      {
+        "id": "ZJ010943",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.5718100070953369
+      },
+      {
+        "id": "ZJ010636",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9845610857009888
+      },
+      {
+        "id": "ZJ015703",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9499990940093994
+      },
+      {
+        "id": "ZJ002215",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9997972846031189
+      },
+      {
+        "id": "ZJ003417",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.9993564486503601
+      }
+    ],
+    "log_loss": 0.3620180031396023,
+    "top3_accuracy": 0.9903030303030304,
+    "class_confidences": {
+      "antelope_duiker": 0.9616803010972608,
+      "bird": 0.9920737495024999,
+      "blank": 0.9123453092243936,
+      "civet_genet": 0.9883088545273926,
+      "hog": 0.998219869238265,
+      "leopard": 0.973820599245614,
+      "monkey_prosimian": 0.9738309918864956,
+      "rodent": 0.9737347795204683
+    },
+    "macro_precision": 0.9194979357361324,
+    "macro_recall": 0.9193005467018817,
+    "macro_f1": 0.9190135443565968,
+    "micro_precision": 0.9139393939393939,
+    "micro_recall": 0.9139393939393939,
+    "micro_f1": 0.9139393939393939,
+    "weighted_precision": 0.9137582032037773,
+    "weighted_recall": 0.9139393939393939,
+    "weighted_f1": 0.9134824589738734,
+    "epoch": 6,
+    "lr_before": 3.454915028125263e-05,
+    "lr_after": 2.0610737385376345e-05,
+    "class_f1s": {
+      "antelope_duiker": 0.8724279835390947,
+      "bird": 0.9518072289156626,
+      "blank": 0.7488584474885844,
+      "civet_genet": 0.9623430962343096,
+      "hog": 0.9791666666666666,
+      "leopard": 0.9868995633187773,
+      "monkey_prosimian": 0.9311740890688259,
+      "rodent": 0.919431279620853
+    },
+    "class_precisions": {
+      "antelope_duiker": 0.8907563025210085,
+      "bird": 0.9404761904761905,
+      "blank": 0.7592592592592593,
+      "civet_genet": 0.9745762711864406,
+      "hog": 1.0,
+      "leopard": 0.9741379310344828,
+      "monkey_prosimian": 0.9349593495934959,
+      "rodent": 0.8818181818181818
+    },
+    "class_recalls": {
+      "antelope_duiker": 0.8548387096774194,
+      "bird": 0.9634146341463414,
+      "blank": 0.7387387387387387,
+      "civet_genet": 0.9504132231404959,
+      "hog": 0.9591836734693877,
+      "leopard": 1.0,
+      "monkey_prosimian": 0.9274193548387096,
+      "rodent": 0.9603960396039604
+    }
+  },
+  {
+    "antelope_duiker": {
+      "precision": 0.8396946564885496,
+      "recall": 0.8870967741935484,
+      "f1-score": 0.8627450980392157,
+      "support": 124.0
+    },
+    "bird": {
+      "precision": 0.9506172839506173,
+      "recall": 0.9390243902439024,
+      "f1-score": 0.9447852760736196,
+      "support": 82.0
+    },
+    "blank": {
+      "precision": 0.8350515463917526,
+      "recall": 0.7297297297297297,
+      "f1-score": 0.7788461538461539,
+      "support": 111.0
+    },
+    "civet_genet": {
+      "precision": 0.967479674796748,
+      "recall": 0.9834710743801653,
+      "f1-score": 0.9754098360655737,
+      "support": 121.0
+    },
+    "hog": {
+      "precision": 1.0,
+      "recall": 0.9591836734693877,
+      "f1-score": 0.9791666666666666,
+      "support": 49.0
+    },
+    "leopard": {
+      "precision": 0.9824561403508771,
+      "recall": 0.9911504424778761,
+      "f1-score": 0.986784140969163,
+      "support": 113.0
+    },
+    "monkey_prosimian": {
+      "precision": 0.959349593495935,
+      "recall": 0.9516129032258065,
+      "f1-score": 0.9554655870445344,
+      "support": 124.0
+    },
+    "rodent": {
+      "precision": 0.908256880733945,
+      "recall": 0.9801980198019802,
+      "f1-score": 0.9428571428571428,
+      "support": 101.0
+    },
+    "accuracy": 0.9248484848484848,
+    "macro avg": {
+      "precision": 0.9303632220260531,
+      "recall": 0.9276833759402996,
+      "f1-score": 0.9282574876952587,
+      "support": 825.0
+    },
+    "weighted avg": {
+      "precision": 0.924290127752358,
+      "recall": 0.9248484848484848,
+      "f1-score": 0.9237834870957974,
+      "support": 825.0
+    },
+    "confusion_matrix": [
+      [
+        110,
+        0,
+        8,
+        1,
+        0,
+        0,
+        3,
+        2
+      ],
+      [
+        1,
+        77,
+        3,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        12,
+        4,
+        81,
+        3,
+        0,
+        2,
+        2,
+        7
+      ],
+      [
+        1,
+        0,
+        1,
+        119,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0,
+        47,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        0,
+        112,
+        0,
+        0
+      ],
+      [
+        4,
+        0,
+        2,
+        0,
+        0,
+        0,
+        118,
+        0
+      ],
+      [
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        99
+      ]
+    ],
+    "loss": 0.4020596567067233,
+    "acc": 0.9248484848484848,
+    "misclassified_images": [
+      {
+        "id": "ZJ001248",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.6738321781158447
+      },
+      {
+        "id": "ZJ007603",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9983940720558167
+      },
+      {
+        "id": "ZJ012900",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9543737173080444
+      },
+      {
+        "id": "ZJ006097",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9699062705039978
+      },
+      {
+        "id": "ZJ012267",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9989136457443237
+      },
+      {
+        "id": "ZJ016104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9839630722999573
+      },
+      {
+        "id": "ZJ004287",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.49936041235923767
+      },
+      {
+        "id": "ZJ015741",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.5329532027244568
+      },
+      {
+        "id": "ZJ010189",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8164749145507812
+      },
+      {
+        "id": "ZJ005260",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.9811844229698181
+      },
+      {
+        "id": "ZJ009497",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.9999489784240723
+      },
+      {
+        "id": "ZJ015860",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9809953570365906
+      },
+      {
+        "id": "ZJ005465",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999622106552124
+      },
+      {
+        "id": "ZJ004932",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8352481126785278
+      },
+      {
+        "id": "ZJ008841",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7494257688522339
+      },
+      {
+        "id": "ZJ001018",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9346126914024353
+      },
+      {
+        "id": "ZJ013547",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9997784495353699
+      },
+      {
+        "id": "ZJ003467",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9833778142929077
+      },
+      {
+        "id": "ZJ011264",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9051019549369812
+      },
+      {
+        "id": "ZJ001512",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.9929994344711304
+      },
+      {
+        "id": "ZJ007793",
+        "true_label": "civet_genet",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9713069796562195
+      },
+      {
+        "id": "ZJ011844",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9951291084289551
+      },
+      {
+        "id": "ZJ000140",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9717725515365601
+      },
+      {
+        "id": "ZJ002572",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9591288566589355
+      },
+      {
+        "id": "ZJ001105",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.993252694606781
+      },
+      {
+        "id": "ZJ000351",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9861828088760376
+      },
+      {
+        "id": "ZJ008083",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999572038650513
+      },
+      {
+        "id": "ZJ010282",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9762730002403259
+      },
+      {
+        "id": "ZJ000857",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9986047148704529
+      },
+      {
+        "id": "ZJ000141",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8372305631637573
+      },
+      {
+        "id": "ZJ005911",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9867072105407715
+      },
+      {
+        "id": "ZJ005880",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9910880327224731
+      },
+      {
+        "id": "ZJ007200",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.5945042371749878
+      },
+      {
+        "id": "ZJ015622",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9893320798873901
+      },
+      {
+        "id": "ZJ010304",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.9695518016815186
+      },
+      {
+        "id": "ZJ006609",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8563244342803955
+      },
+      {
+        "id": "ZJ007838",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.8039801120758057
+      },
+      {
+        "id": "ZJ008530",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9997005462646484
+      },
+      {
+        "id": "ZJ005344",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9735326766967773
+      },
+      {
+        "id": "ZJ008776",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8312332630157471
+      },
+      {
+        "id": "ZJ012004",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.7752547860145569
+      },
+      {
+        "id": "ZJ015052",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9638617038726807
+      },
+      {
+        "id": "ZJ001241",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.5206608176231384
+      },
+      {
+        "id": "ZJ002721",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.7542775273323059
+      },
+      {
+        "id": "ZJ001518",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.9347177743911743
+      },
+      {
+        "id": "ZJ010326",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9504910111427307
+      },
+      {
+        "id": "ZJ006498",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9996376037597656
+      },
+      {
+        "id": "ZJ014641",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6343918442726135
+      },
+      {
+        "id": "ZJ004887",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9174934029579163
+      },
+      {
+        "id": "ZJ008258",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8904278874397278
+      },
+      {
+        "id": "ZJ003012",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9992166757583618
+      },
+      {
+        "id": "ZJ002104",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9517949819564819
+      },
+      {
+        "id": "ZJ002657",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9998551607131958
+      },
+      {
+        "id": "ZJ009425",
+        "true_label": "bird",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9919320940971375
+      },
+      {
+        "id": "ZJ004106",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9842766523361206
+      },
+      {
+        "id": "ZJ008497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9183273315429688
+      },
+      {
+        "id": "ZJ010364",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9617164134979248
+      },
+      {
+        "id": "ZJ013619",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.7228022217750549
+      },
+      {
+        "id": "ZJ010636",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9966105818748474
+      },
+      {
+        "id": "ZJ000707",
+        "true_label": "leopard",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.3754282593727112
+      },
+      {
+        "id": "ZJ002215",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9836193919181824
+      },
+      {
+        "id": "ZJ003417",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.9999107122421265
+      }
+    ],
+    "log_loss": 0.4020596791031702,
+    "top3_accuracy": 0.9890909090909091,
+    "class_confidences": {
+      "antelope_duiker": 0.975373211480279,
+      "bird": 0.9863801524962907,
+      "blank": 0.9451185968733326,
+      "civet_genet": 0.9948361065329575,
+      "hog": 0.9998901575169665,
+      "leopard": 0.9879736586620933,
+      "monkey_prosimian": 0.9747778361405783,
+      "rodent": 0.979025791544433
+    },
+    "macro_precision": 0.9303632220260531,
+    "macro_recall": 0.9276833759402996,
+    "macro_f1": 0.9282574876952587,
+    "micro_precision": 0.9248484848484848,
+    "micro_recall": 0.9248484848484848,
+    "micro_f1": 0.9248484848484848,
+    "weighted_precision": 0.924290127752358,
+    "weighted_recall": 0.9248484848484848,
+    "weighted_f1": 0.9237834870957974,
+    "epoch": 7,
+    "lr_before": 2.0610737385376345e-05,
+    "lr_after": 9.549150281252631e-06,
+    "class_f1s": {
+      "antelope_duiker": 0.8627450980392157,
+      "bird": 0.9447852760736196,
+      "blank": 0.7788461538461539,
+      "civet_genet": 0.9754098360655737,
+      "hog": 0.9791666666666666,
+      "leopard": 0.986784140969163,
+      "monkey_prosimian": 0.9554655870445344,
+      "rodent": 0.9428571428571428
+    },
+    "class_precisions": {
+      "antelope_duiker": 0.8396946564885496,
+      "bird": 0.9506172839506173,
+      "blank": 0.8350515463917526,
+      "civet_genet": 0.967479674796748,
+      "hog": 1.0,
+      "leopard": 0.9824561403508771,
+      "monkey_prosimian": 0.959349593495935,
+      "rodent": 0.908256880733945
+    },
+    "class_recalls": {
+      "antelope_duiker": 0.8870967741935484,
+      "bird": 0.9390243902439024,
+      "blank": 0.7297297297297297,
+      "civet_genet": 0.9834710743801653,
+      "hog": 0.9591836734693877,
+      "leopard": 0.9911504424778761,
+      "monkey_prosimian": 0.9516129032258065,
+      "rodent": 0.9801980198019802
+    }
+  },
+  {
+    "antelope_duiker": {
+      "precision": 0.9016393442622951,
+      "recall": 0.8870967741935484,
+      "f1-score": 0.8943089430894309,
+      "support": 124.0
+    },
+    "bird": {
+      "precision": 0.9629629629629629,
+      "recall": 0.9512195121951219,
+      "f1-score": 0.9570552147239264,
+      "support": 82.0
+    },
+    "blank": {
+      "precision": 0.8252427184466019,
+      "recall": 0.7657657657657657,
+      "f1-score": 0.794392523364486,
+      "support": 111.0
+    },
+    "civet_genet": {
+      "precision": 0.9672131147540983,
+      "recall": 0.9752066115702479,
+      "f1-score": 0.9711934156378601,
+      "support": 121.0
+    },
+    "hog": {
+      "precision": 1.0,
+      "recall": 0.9795918367346939,
+      "f1-score": 0.9896907216494846,
+      "support": 49.0
+    },
+    "leopard": {
+      "precision": 0.9823008849557522,
+      "recall": 0.9823008849557522,
+      "f1-score": 0.9823008849557522,
+      "support": 113.0
+    },
+    "monkey_prosimian": {
+      "precision": 0.9375,
+      "recall": 0.967741935483871,
+      "f1-score": 0.9523809523809523,
+      "support": 124.0
+    },
+    "rodent": {
+      "precision": 0.9074074074074074,
+      "recall": 0.9702970297029703,
+      "f1-score": 0.937799043062201,
+      "support": 101.0
+    },
+    "accuracy": 0.9309090909090909,
+    "macro avg": {
+      "precision": 0.9355333040986398,
+      "recall": 0.9349025438252464,
+      "f1-score": 0.9348902123580116,
+      "support": 825.0
+    },
+    "weighted avg": {
+      "precision": 0.9300595374938841,
+      "recall": 0.9309090909090909,
+      "f1-score": 0.9301486021108308,
+      "support": 825.0
+    },
+    "confusion_matrix": [
+      [
+        110,
+        0,
+        7,
+        1,
+        0,
+        0,
+        4,
+        2
+      ],
+      [
+        0,
+        78,
+        3,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        8,
+        3,
+        85,
+        3,
+        0,
+        2,
+        3,
+        7
+      ],
+      [
+        1,
+        0,
+        2,
+        118,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        48,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        111,
+        1,
+        0
+      ],
+      [
+        2,
+        0,
+        2,
+        0,
+        0,
+        0,
+        120,
+        0
+      ],
+      [
+        0,
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        98
+      ]
+    ],
+    "loss": 0.38597230990727743,
+    "acc": 0.9309090909090909,
+    "misclassified_images": [
+      {
+        "id": "ZJ001248",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.6226639151573181
+      },
+      {
+        "id": "ZJ007603",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9998279809951782
+      },
+      {
+        "id": "ZJ006097",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.975081741809845
+      },
+      {
+        "id": "ZJ012267",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9981123208999634
+      },
+      {
+        "id": "ZJ016104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.994388997554779
+      },
+      {
+        "id": "ZJ015741",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.8708575963973999
+      },
+      {
+        "id": "ZJ005260",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.8906552791595459
+      },
+      {
+        "id": "ZJ009497",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.999889612197876
+      },
+      {
+        "id": "ZJ015860",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9953804016113281
+      },
+      {
+        "id": "ZJ005465",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999822378158569
+      },
+      {
+        "id": "ZJ008922",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.7860534191131592
+      },
+      {
+        "id": "ZJ004932",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.8831576108932495
+      },
+      {
+        "id": "ZJ008841",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5933172702789307
+      },
+      {
+        "id": "ZJ001018",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.47925612330436707
+      },
+      {
+        "id": "ZJ013547",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9984740614891052
+      },
+      {
+        "id": "ZJ003467",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9333364963531494
+      },
+      {
+        "id": "ZJ001512",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.9900064468383789
+      },
+      {
+        "id": "ZJ007793",
+        "true_label": "civet_genet",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7268916964530945
+      },
+      {
+        "id": "ZJ011844",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9985026121139526
+      },
+      {
+        "id": "ZJ000140",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9801884889602661
+      },
+      {
+        "id": "ZJ002572",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.7892151474952698
+      },
+      {
+        "id": "ZJ001105",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9975889921188354
+      },
+      {
+        "id": "ZJ007384",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.7631158828735352
+      },
+      {
+        "id": "ZJ000351",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7819423079490662
+      },
+      {
+        "id": "ZJ008083",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999843835830688
+      },
+      {
+        "id": "ZJ010282",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.985975444316864
+      },
+      {
+        "id": "ZJ000857",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9974918365478516
+      },
+      {
+        "id": "ZJ000141",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.703883945941925
+      },
+      {
+        "id": "ZJ005911",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.6375213861465454
+      },
+      {
+        "id": "ZJ005880",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7779024839401245
+      },
+      {
+        "id": "ZJ007200",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.8222009539604187
+      },
+      {
+        "id": "ZJ010304",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.9895102977752686
+      },
+      {
+        "id": "ZJ006609",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9389711022377014
+      },
+      {
+        "id": "ZJ007838",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9955944418907166
+      },
+      {
+        "id": "ZJ008530",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9997914433479309
+      },
+      {
+        "id": "ZJ005344",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9771990776062012
+      },
+      {
+        "id": "ZJ008776",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8039209246635437
+      },
+      {
+        "id": "ZJ012004",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.6579551100730896
+      },
+      {
+        "id": "ZJ015052",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.4576388895511627
+      },
+      {
+        "id": "ZJ001241",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.486933171749115
+      },
+      {
+        "id": "ZJ002721",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.8270800113677979
+      },
+      {
+        "id": "ZJ001518",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.9277405738830566
+      },
+      {
+        "id": "ZJ010326",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9912093877792358
+      },
+      {
+        "id": "ZJ006498",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9999043941497803
+      },
+      {
+        "id": "ZJ014641",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8800162672996521
+      },
+      {
+        "id": "ZJ004887",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9805654287338257
+      },
+      {
+        "id": "ZJ003012",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9986932873725891
+      },
+      {
+        "id": "ZJ002104",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9411436319351196
+      },
+      {
+        "id": "ZJ002657",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9997977614402771
+      },
+      {
+        "id": "ZJ004106",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9565613865852356
+      },
+      {
+        "id": "ZJ008497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7649885416030884
+      },
+      {
+        "id": "ZJ013619",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.8511979579925537
+      },
+      {
+        "id": "ZJ010943",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.5588870644569397
+      },
+      {
+        "id": "ZJ010636",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9962626099586487
+      },
+      {
+        "id": "ZJ000707",
+        "true_label": "leopard",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.4998055398464203
+      },
+      {
+        "id": "ZJ002215",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9991117119789124
+      },
+      {
+        "id": "ZJ003417",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.9999607801437378
+      }
+    ],
+    "log_loss": 0.3859723280985846,
+    "top3_accuracy": 0.9890909090909091,
+    "class_confidences": {
+      "antelope_duiker": 0.9624480639324814,
+      "bird": 0.9890338005842986,
+      "blank": 0.9456523002930057,
+      "civet_genet": 0.9957745583330999,
+      "hog": 0.9909378488858541,
+      "leopard": 0.9898371132074204,
+      "monkey_prosimian": 0.9734874742571265,
+      "rodent": 0.980827436402992
+    },
+    "macro_precision": 0.9355333040986398,
+    "macro_recall": 0.9349025438252464,
+    "macro_f1": 0.9348902123580116,
+    "micro_precision": 0.9309090909090909,
+    "micro_recall": 0.9309090909090909,
+    "micro_f1": 0.9309090909090909,
+    "weighted_precision": 0.9300595374938841,
+    "weighted_recall": 0.9309090909090909,
+    "weighted_f1": 0.9301486021108308,
+    "epoch": 8,
+    "lr_before": 9.549150281252631e-06,
+    "lr_after": 2.447174185242323e-06,
+    "class_f1s": {
+      "antelope_duiker": 0.8943089430894309,
+      "bird": 0.9570552147239264,
+      "blank": 0.794392523364486,
+      "civet_genet": 0.9711934156378601,
+      "hog": 0.9896907216494846,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.9523809523809523,
+      "rodent": 0.937799043062201
+    },
+    "class_precisions": {
+      "antelope_duiker": 0.9016393442622951,
+      "bird": 0.9629629629629629,
+      "blank": 0.8252427184466019,
+      "civet_genet": 0.9672131147540983,
+      "hog": 1.0,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.9375,
+      "rodent": 0.9074074074074074
+    },
+    "class_recalls": {
+      "antelope_duiker": 0.8870967741935484,
+      "bird": 0.9512195121951219,
+      "blank": 0.7657657657657657,
+      "civet_genet": 0.9752066115702479,
+      "hog": 0.9795918367346939,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.967741935483871,
+      "rodent": 0.9702970297029703
+    }
+  },
+  {
+    "antelope_duiker": {
+      "precision": 0.8870967741935484,
+      "recall": 0.8870967741935484,
+      "f1-score": 0.8870967741935484,
+      "support": 124.0
+    },
+    "bird": {
+      "precision": 0.9518072289156626,
+      "recall": 0.9634146341463414,
+      "f1-score": 0.9575757575757575,
+      "support": 82.0
+    },
+    "blank": {
+      "precision": 0.851063829787234,
+      "recall": 0.7207207207207207,
+      "f1-score": 0.7804878048780488,
+      "support": 111.0
+    },
+    "civet_genet": {
+      "precision": 0.967479674796748,
+      "recall": 0.9834710743801653,
+      "f1-score": 0.9754098360655737,
+      "support": 121.0
+    },
+    "hog": {
+      "precision": 1.0,
+      "recall": 0.9795918367346939,
+      "f1-score": 0.9896907216494846,
+      "support": 49.0
+    },
+    "leopard": {
+      "precision": 0.9823008849557522,
+      "recall": 0.9823008849557522,
+      "f1-score": 0.9823008849557522,
+      "support": 113.0
+    },
+    "monkey_prosimian": {
+      "precision": 0.9302325581395349,
+      "recall": 0.967741935483871,
+      "f1-score": 0.9486166007905138,
+      "support": 124.0
+    },
+    "rodent": {
+      "precision": 0.8918918918918919,
+      "recall": 0.9801980198019802,
+      "f1-score": 0.9339622641509434,
+      "support": 101.0
+    },
+    "accuracy": 0.9284848484848485,
+    "macro avg": {
+      "precision": 0.9327341053350465,
+      "recall": 0.9330669850521341,
+      "f1-score": 0.9318925805324528,
+      "support": 825.0
+    },
+    "weighted avg": {
+      "precision": 0.9272863476584936,
+      "recall": 0.9284848484848485,
+      "f1-score": 0.9268284135329741,
+      "support": 825.0
+    },
+    "confusion_matrix": [
+      [
+        110,
+        0,
+        6,
+        1,
+        0,
+        0,
+        4,
+        3
+      ],
+      [
+        0,
+        79,
+        2,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        10,
+        4,
+        80,
+        3,
+        0,
+        2,
+        4,
+        8
+      ],
+      [
+        1,
+        0,
+        1,
+        119,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        0,
+        48,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        0,
+        111,
+        1,
+        0
+      ],
+      [
+        2,
+        0,
+        2,
+        0,
+        0,
+        0,
+        120,
+        0
+      ],
+      [
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        99
+      ]
+    ],
+    "loss": 0.4153554267594309,
+    "acc": 0.9284848484848485,
+    "misclassified_images": [
+      {
+        "id": "ZJ001248",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.7642844915390015
+      },
+      {
+        "id": "ZJ007603",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9996238946914673
+      },
+      {
+        "id": "ZJ006097",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9947270750999451
+      },
+      {
+        "id": "ZJ012267",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9990683197975159
+      },
+      {
+        "id": "ZJ016104",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9980077147483826
+      },
+      {
+        "id": "ZJ004287",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.4622502028942108
+      },
+      {
+        "id": "ZJ015741",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.7565711140632629
+      },
+      {
+        "id": "ZJ010189",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8784551620483398
+      },
+      {
+        "id": "ZJ005260",
+        "true_label": "antelope_duiker",
+        "predicted_label": "civet_genet",
+        "probability": 0.9509077072143555
+      },
+      {
+        "id": "ZJ009497",
+        "true_label": "bird",
+        "predicted_label": "rodent",
+        "probability": 0.9999486207962036
+      },
+      {
+        "id": "ZJ015860",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.994281530380249
+      },
+      {
+        "id": "ZJ005465",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.999987006187439
+      },
+      {
+        "id": "ZJ008922",
+        "true_label": "leopard",
+        "predicted_label": "blank",
+        "probability": 0.7192321419715881
+      },
+      {
+        "id": "ZJ004932",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9169167280197144
+      },
+      {
+        "id": "ZJ008841",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8499455451965332
+      },
+      {
+        "id": "ZJ001018",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7246260046958923
+      },
+      {
+        "id": "ZJ013547",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9990034699440002
+      },
+      {
+        "id": "ZJ003467",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9877833724021912
+      },
+      {
+        "id": "ZJ011264",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.5951735973358154
+      },
+      {
+        "id": "ZJ001512",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.9589400291442871
+      },
+      {
+        "id": "ZJ007793",
+        "true_label": "civet_genet",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8417468070983887
+      },
+      {
+        "id": "ZJ011844",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9993640780448914
+      },
+      {
+        "id": "ZJ000140",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9853442311286926
+      },
+      {
+        "id": "ZJ002572",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.5500774383544922
+      },
+      {
+        "id": "ZJ001105",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9964603781700134
+      },
+      {
+        "id": "ZJ007384",
+        "true_label": "rodent",
+        "predicted_label": "blank",
+        "probability": 0.5841116309165955
+      },
+      {
+        "id": "ZJ000351",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9138318300247192
+      },
+      {
+        "id": "ZJ008083",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.9999881982803345
+      },
+      {
+        "id": "ZJ010282",
+        "true_label": "antelope_duiker",
+        "predicted_label": "rodent",
+        "probability": 0.9918034076690674
+      },
+      {
+        "id": "ZJ000857",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.9983553290367126
+      },
+      {
+        "id": "ZJ000141",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.6524091958999634
+      },
+      {
+        "id": "ZJ005911",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9333385825157166
+      },
+      {
+        "id": "ZJ005880",
+        "true_label": "hog",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.7864595651626587
+      },
+      {
+        "id": "ZJ007200",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.973816454410553
+      },
+      {
+        "id": "ZJ015622",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9093193411827087
+      },
+      {
+        "id": "ZJ010304",
+        "true_label": "civet_genet",
+        "predicted_label": "blank",
+        "probability": 0.9811562299728394
+      },
+      {
+        "id": "ZJ006609",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.949068009853363
+      },
+      {
+        "id": "ZJ007838",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9901096820831299
+      },
+      {
+        "id": "ZJ008530",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9998787641525269
+      },
+      {
+        "id": "ZJ005344",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9739580154418945
+      },
+      {
+        "id": "ZJ008776",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.8404221534729004
+      },
+      {
+        "id": "ZJ015052",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.5690210461616516
+      },
+      {
+        "id": "ZJ002721",
+        "true_label": "blank",
+        "predicted_label": "civet_genet",
+        "probability": 0.8509101867675781
+      },
+      {
+        "id": "ZJ001518",
+        "true_label": "blank",
+        "predicted_label": "leopard",
+        "probability": 0.9352366328239441
+      },
+      {
+        "id": "ZJ010326",
+        "true_label": "antelope_duiker",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9950279593467712
+      },
+      {
+        "id": "ZJ006498",
+        "true_label": "bird",
+        "predicted_label": "blank",
+        "probability": 0.9998763799667358
+      },
+      {
+        "id": "ZJ014641",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9704447388648987
+      },
+      {
+        "id": "ZJ004887",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9928886294364929
+      },
+      {
+        "id": "ZJ003012",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9993256330490112
+      },
+      {
+        "id": "ZJ002104",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8687159419059753
+      },
+      {
+        "id": "ZJ002657",
+        "true_label": "antelope_duiker",
+        "predicted_label": "blank",
+        "probability": 0.9995437264442444
+      },
+      {
+        "id": "ZJ004106",
+        "true_label": "blank",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.9853626489639282
+      },
+      {
+        "id": "ZJ008497",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "antelope_duiker",
+        "probability": 0.8337351679801941
+      },
+      {
+        "id": "ZJ013619",
+        "true_label": "blank",
+        "predicted_label": "bird",
+        "probability": 0.7806373238563538
+      },
+      {
+        "id": "ZJ010636",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9983683228492737
+      },
+      {
+        "id": "ZJ000707",
+        "true_label": "leopard",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.6391485333442688
+      },
+      {
+        "id": "ZJ015703",
+        "true_label": "blank",
+        "predicted_label": "rodent",
+        "probability": 0.9477921724319458
+      },
+      {
+        "id": "ZJ002215",
+        "true_label": "blank",
+        "predicted_label": "monkey_prosimian",
+        "probability": 0.9996688365936279
+      },
+      {
+        "id": "ZJ003417",
+        "true_label": "monkey_prosimian",
+        "predicted_label": "blank",
+        "probability": 0.9999518394470215
+      }
+    ],
+    "log_loss": 0.4153554537051758,
+    "top3_accuracy": 0.9903030303030304,
+    "class_confidences": {
+      "antelope_duiker": 0.9765351313737131,
+      "bird": 0.978615804609046,
+      "blank": 0.9609642440968371,
+      "civet_genet": 0.9924526902718273,
+      "hog": 0.9918480068445206,
+      "leopard": 0.9941593202869449,
+      "monkey_prosimian": 0.9778793216213699,
+      "rodent": 0.9817444692860853
+    },
+    "macro_precision": 0.9327341053350465,
+    "macro_recall": 0.9330669850521341,
+    "macro_f1": 0.9318925805324528,
+    "micro_precision": 0.9284848484848485,
+    "micro_recall": 0.9284848484848485,
+    "micro_f1": 0.9284848484848485,
+    "weighted_precision": 0.9272863476584936,
+    "weighted_recall": 0.9284848484848485,
+    "weighted_f1": 0.9268284135329741,
+    "epoch": 9,
+    "lr_before": 2.447174185242323e-06,
+    "lr_after": 0.0,
+    "class_f1s": {
+      "antelope_duiker": 0.8870967741935484,
+      "bird": 0.9575757575757575,
+      "blank": 0.7804878048780488,
+      "civet_genet": 0.9754098360655737,
+      "hog": 0.9896907216494846,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.9486166007905138,
+      "rodent": 0.9339622641509434
+    },
+    "class_precisions": {
+      "antelope_duiker": 0.8870967741935484,
+      "bird": 0.9518072289156626,
+      "blank": 0.851063829787234,
+      "civet_genet": 0.967479674796748,
+      "hog": 1.0,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.9302325581395349,
+      "rodent": 0.8918918918918919
+    },
+    "class_recalls": {
+      "antelope_duiker": 0.8870967741935484,
+      "bird": 0.9634146341463414,
+      "blank": 0.7207207207207207,
+      "civet_genet": 0.9834710743801653,
+      "hog": 0.9795918367346939,
+      "leopard": 0.9823008849557522,
+      "monkey_prosimian": 0.967741935483871,
+      "rodent": 0.9801980198019802
+    }
+  }
+]
