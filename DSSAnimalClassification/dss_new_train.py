@@ -13,63 +13,15 @@ from torchvision.ops import StochasticDepth
 from torch.cuda.amp import GradScaler, autocast
 import sys
 from torch.optim.lr_scheduler import CosineAnnealingLR
-# import pickle
-# from io import BytesIO
-# import boto3
 
-import copy
-import json
-import gc
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 
-"""
-METRICS EXPLANATION:
-====================
+import torchvision.transforms as transforms
 
-BASIC METRICS:
-- accuracy: Overall % correct predictions (good baseline, but can be misleading with imbalanced data)
-- loss (cross-entropy): Training objective being minimized. Lower = better fit to training data
-
-CONFIDENCE METRICS:
-- log_loss: Measures quality of probability predictions. Lower = better calibrated confidence
-  * Range: 0 (perfect) to infinity (worse)
-  * Example: If model predicts 99% confidence and is right, low log_loss. If 51% and right, higher log_loss
-  
-- top3_accuracy: % of samples where correct class is in top 3 predictions
-  * Useful when close calls are acceptable (e.g., bird vs blank, two similar species)
-  * Higher = model at least narrows down possibilities well
-
-PER-CLASS METRICS (in classification_report):
-- precision: Of all predictions for class X, what % were actually X? (Avoiding false alarms)
-  * High precision = when model says "leopard", it's usually right
-  
-- recall: Of all actual X samples, what % did we find? (Avoiding misses)
-  * High recall = we catch most of the leopards in the dataset
-  
-- f1-score: Harmonic mean of precision and recall (balances both)
-  * Use this as main per-class metric. Range: 0 to 1, higher = better
-
-- support: Number of actual samples of this class in the dataset
-
-AGGREGATED METRICS:
-- macro avg: Simple average across all classes (treats all classes equally)
-  * Use when all animal types are equally important
-  
-- weighted avg: Average weighted by number of samples per class
-  * Use when some animals are more common/important
-  
-- micro avg: Global average (usually same as accuracy for multi-class)
-
-PER-CLASS CONFIDENCE:
-- Average prediction confidence when model predicts each class
-- High confidence + high F1 = model is sure and correct
-- High confidence + low F1 = model is overconfident and wrong (needs calibration)
-- Low confidence = model is uncertain (may need more training data for that class)
-
-CONFUSION MATRIX:
-- Shows which classes get confused with each other
-- Row = actual class, Column = predicted class
-- Diagonal = correct predictions
-"""
+import timm
+import psutil
+from tqdm import tqdm
 
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -140,8 +92,9 @@ def get_gpu_memory():
     return 0, 0
 
 
+class AnimalDatasetConvnext(Dataset):
+    """Dataset for training with Albumentations transforms (expects image= keyword arg)"""
 
-class AnimalDatasetSwin(Dataset):
     def __init__(self, dataframe, transform=None, folder="", img_size=224):
         self.dataframe = dataframe.reset_index(drop=True)
         self.transform = transform
@@ -249,90 +202,63 @@ class AnimalDatasetSwin(Dataset):
         try:
             if not os.path.exists(image_path):
                 raise FileNotFoundError(f"Image file not found: {image_path}")
-            image = Image.open(image_path).convert("RGB")
+            image = cv2.imread(image_path)
+            if image is None:
+                raise ValueError(f"cv2.imread returned None for: {image_path}")
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         except Exception as e:
             print(f"Error loading {image_path}: {e}")
-            image = Image.new('RGB', (self.img_size, self.img_size), color=(128, 128, 128))
-     
+            image = np.zeros((self.img_size, self.img_size, 3), dtype=np.uint8)
+
         if self.transform:
-            image = self.transform(image)
+            transformed_image = self.transform(image=image)
+            done_image = transformed_image["image"]
         else:
-            transform = self.class_transforms[self.label_columns[self.labels[idx]]]
-            image = transform(image)
-        return image, self.labels[idx], self.dataframe.iloc[idx]["id"]
+            done_image = np.zeros((self.img_size, self.img_size, 3), dtype=np.uint8)
+
+        return done_image, self.labels[idx], self.dataframe.iloc[idx]["id"]
+
     def get_y(self):
         return self.labels
-    # def show_image(self, idx):
-    #     image = self.dataframe.iloc[idx]["image"]
-    #     plt.imshow(image)
-    #     plt.axis("off")
-    #     plt.show()
 
-# class AnimalDataset(Dataset):
-#     def __init__(self, dataframe, transform=None, folder="", img_size=224):
-   
-#         self.dataframe = dataframe.reset_index(drop=True)
-        
-#         self.transform = transform
-#         self.img_size = img_size
-#         # Extract labels (one-hot to class index)
-#         label_columns = [
-#             "antelope_duiker",
-#             "bird",
-#             "blank",
-#             "civet_genet",
-#             "hog",
-#             "leopard",
-#             "monkey_prosimian",
-#             "rodent",
-#         ]
-#         y = dataframe[label_columns].values
-#         assert (y.sum(axis=1) == 1).all()
-#         self.labels = y.argmax(axis=1).astype("int64")
-#         self.folder = folder
 
-#     def __len__(self):
-#         return len(self.dataframe)
+class AnimalDatasetTest(Dataset):
+    """Dataset for testing - returns only (image, id) for inference"""
 
-#     def __getitem__(self, idx):
-#         # Get image (numpy array) from DataFrame
-#         id = self.dataframe.iloc[idx]["id"]
-#         filename = id + ".jpg"
-#         image_path = os.path.join(self.folder, filename)
-        
-#         try:
-#             if not os.path.exists(image_path):
-#                 raise FileNotFoundError(f"Image file not found: {image_path}")
-#             image = Image.open(image_path).convert("RGB")
-#         except Exception as e:
-#             # Log error but don't print for every missing image to avoid spam
-#             if idx < 10:  # Only print first 10 errors
-#                 print(f"Error loading {image_path}: {e}")
-#             # Create a blank image as fallback (will hurt training but prevents crash)
-#             image = Image.new('RGB', (self.img_size, self.img_size), color=(128, 128, 128))
+    def __init__(self, dataframe, transform=None, folder="", img_size=224):
+        self.dataframe = dataframe.reset_index(drop=True)
+        self.transform = transform
+        self.img_size = img_size
+        self.folder = folder
 
-#         if self.transform:
-#             image = self.transform(image)
+    def __len__(self):
+        return len(self.dataframe)
 
-#         return image, self.labels[idx], self.dataframe.iloc[idx]["id"]
-#     def get_y(self):
-#         return self.labels
+    def __getitem__(self, idx):
+        id = self.dataframe.iloc[idx]["id"]
+        filename = id + ".jpg"
+        image_path = os.path.join(self.folder, filename)
 
-#     def show_image(self, idx):
-#         image = self.dataframe.iloc[idx]["image"]
-#         plt.imshow(image)
-#         plt.axis("off")
-#         plt.show()
+        try:
+            if not os.path.exists(image_path):
+                raise FileNotFoundError(f"Image file not found: {image_path}")
+            image = cv2.imread(image_path)
+            if image is None:
+                raise ValueError(f"cv2.imread returned None for: {image_path}")
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        except Exception as e:
+            print(f"Error loading {image_path}: {e}")
+            image = np.zeros((self.img_size, self.img_size, 3), dtype=np.uint8)
 
-#     def return_numpy_image(self, idx):
-#         return self.dataframe.iloc[idx]["image"]
+        if self.transform:
+            transformed_image = self.transform(image=image)
+            done_image = transformed_image["image"]
+        else:
+            done_image = np.zeros((self.img_size, self.img_size, 3), dtype=np.uint8)
 
-#     def return_transformed_image(self, idx):
-#         image = self.dataframe.iloc[idx]["image"]
-#         image = Image.fromarray(image.astype('uint8'))
-#         if self.transform:
-#             image = self.transform(image)
-#         return image
+        return done_image, id
+
+
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
@@ -392,11 +318,10 @@ def train_epoch(model, dataloader, criterion, optimizer, device, class_names, nu
     all_probs = np.array(all_probs)
     all_labels = np.array(all_labels)
     all_preds = np.array(all_preds)
-    # all_ids stays as list (strings)
-    
-    
-    
-    misclassified_images = pd.DataFrame(columns=["id", "true_label", "predicted_label", "probability"])
+
+    misclassified_images = pd.DataFrame(
+        columns=["id", "true_label", "predicted_label", "probability"]
+    )
     for i, id in enumerate(all_ids):
         if all_preds[i] != all_labels[i]:
             misclassified_images.loc[len(misclassified_images)] = {
@@ -405,33 +330,31 @@ def train_epoch(model, dataloader, criterion, optimizer, device, class_names, nu
                 "predicted_label": class_names[all_preds[i]],
                 "probability": all_probs[i][all_preds[i]]
             }
-    
-    # Basic metrics - classification_report returns dict with macro avg, weighted avg, accuracy
-    report = classification_report(all_labels, all_preds, target_names=class_names, output_dict=True, zero_division=0)
-    
-    # Confusion matrix as list (not numpy array)
-    report['confusion_matrix'] = confusion_matrix(all_labels, all_preds).tolist()
-    
-    # Scalar metrics (already Python types)
-    report['loss'] = float(running_loss / total)
-    report['acc'] = float(correct / total)
-    report['ids'] = all_ids  # List of strings (will be removed in save())
+
+    report = classification_report(
+        all_labels,
+        all_preds,
+        target_names=class_names,
+        output_dict=True,
+        zero_division=0,
+    )
+
+    report["confusion_matrix"] = confusion_matrix(all_labels, all_preds).tolist()
+    report["loss"] = float(running_loss / total)
+    report["acc"] = float(correct / total)
+    report["ids"] = all_ids
     epoch_acc = float(correct / total)
-    report['misclassified_images'] = misclassified_images  # DataFrame (will be converted in save())
-    
-    # Additional valuable metrics
-    # 1. Log Loss (returns numpy.float64, ensure it's Python float)
-    report['log_loss'] = float(log_loss(all_labels, all_probs))
-    
-    # 2. Top-3 Accuracy (Python float)
+    report["misclassified_images"] = misclassified_images
+
+    report["log_loss"] = float(log_loss(all_labels, all_probs))
+
     top3_correct = 0
     for i, label in enumerate(all_labels):
         top3_preds = np.argsort(all_probs[i])[-3:]
         if label in top3_preds:
             top3_correct += 1
-    report['top3_accuracy'] = float(top3_correct / len(all_labels))
-    
-    # 3. Per-class confidence (dict of Python floats)
+    report["top3_accuracy"] = float(top3_correct / len(all_labels))
+
     class_confidences = {}
     for i, class_name in enumerate(class_names):
         class_mask = all_preds == i
@@ -475,79 +398,70 @@ def validate_epoch(model, dataloader, criterion, device, class_names):
     total = 0
     all_preds = []
     all_labels = []
-    all_probs = []  # For storing prediction probabilities
-    all_ids =[]
+    all_probs = []
+    all_ids = []
 
     pbar = tqdm(dataloader, desc="Validating")
     with torch.no_grad():
-
         for images, labels, ids in pbar:
             images, labels = images.to(device), labels.to(device)
-            # ids are strings, don't move to device
 
-            # Forward pass
             outputs = model(images)
             loss = criterion(outputs, labels)
-            
-            # Get probabilities for additional metrics
+
             probs = torch.softmax(outputs, dim=1)
             all_probs.extend(probs.detach().cpu().numpy().tolist())
-            
-            # Statistics
+
             running_loss += loss.item() * images.size(0)
             _, predicted = torch.max(outputs, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-            all_ids.extend(ids)  # ids are already strings, not tensors
+            all_ids.extend(ids)
             all_preds.extend(predicted.detach().cpu().numpy().tolist())
             all_labels.extend(labels.detach().cpu().numpy().tolist())
 
             pbar.set_postfix(loss=f"{loss.item():.4f}", acc=f"{correct / total:.4f}")
 
-    # Convert to numpy arrays for easier manipulation
     all_probs = np.array(all_probs)
     all_labels = np.array(all_labels)
     all_preds = np.array(all_preds)
-    # all_ids stays as list (strings)
-    
-    
-    
-    misclassified_images = pd.DataFrame(columns=["id", "true_label", "predicted_label", "probability"])
+
+    misclassified_images = pd.DataFrame(
+        columns=["id", "true_label", "predicted_label", "probability"]
+    )
     for i, id in enumerate(all_ids):
         if all_preds[i] != all_labels[i]:
             misclassified_images.loc[len(misclassified_images)] = {
                 "id": id,
                 "true_label": class_names[all_labels[i]],
                 "predicted_label": class_names[all_preds[i]],
-                "probability": all_probs[i][all_preds[i]]
+                "probability": all_probs[i][all_preds[i]],
             }
-    
-    # Basic metrics - classification_report returns dict with macro avg, weighted avg, accuracy
-    report = classification_report(all_labels, all_preds, target_names=class_names, output_dict=True, zero_division=0)
-    
-    # Confusion matrix as list (not numpy array)
-    report['confusion_matrix'] = confusion_matrix(all_labels, all_preds).tolist()
-    
-    # Scalar metrics (already Python types)
-    report['loss'] = float(running_loss / total)
-    report['acc'] = float(correct / total)
-    report['ids'] = all_ids  # List of strings (will be removed in save())
+
+    report = classification_report(
+        all_labels,
+        all_preds,
+        target_names=class_names,
+        output_dict=True,
+        zero_division=0,
+    )
+
+    report["confusion_matrix"] = confusion_matrix(all_labels, all_preds).tolist()
+    report["loss"] = float(running_loss / total)
+    report["acc"] = float(correct / total)
+    report["ids"] = all_ids
     epoch_acc = float(correct / total)
-    report['misclassified_images'] = misclassified_images  # DataFrame (will be converted in save())
-    
-    # Additional valuable metrics
-    # 1. Log Loss (returns numpy.float64, ensure it's Python float)
-    report['log_loss'] = float(log_loss(all_labels, all_probs))
-    
-    # 2. Top-3 Accuracy (Python float)
+    report["misclassified_images"] = misclassified_images
+
+    report["log_loss"] = float(log_loss(all_labels, all_probs))
+
     top3_correct = 0
     for i, label in enumerate(all_labels):
         top3_preds = np.argsort(all_probs[i])[-3:]
         if label in top3_preds:
             top3_correct += 1
-    report['top3_accuracy'] = float(top3_correct / len(all_labels))
-    
-    # 3. Per-class confidence (dict of Python floats)
+    report["top3_accuracy"] = float(top3_correct / len(all_labels))
+
     class_confidences = {}
     for i, class_name in enumerate(class_names):
         class_mask = all_preds == i
@@ -588,93 +502,274 @@ def validate_epoch(model, dataloader, criterion, device, class_names):
 
 class TrainingLogger:
     """Professional logging for SageMaker training"""
-    
-    def __init__(self, output_dir=None, name="metrics", class_names=None):
-        self.output_dir = output_dir # or os.environ.get('SM_OUTPUT_DATA_DIR', '/opt/ml/output/data')
-        # os.makedirs(self.output_dir, exist_ok=True)
+
+    def __init__(
+        self,
+        data_output_dir,
+        name="metrics",
+        class_names=None,
+        transform_name=None,
+    ):
+        self.data_output_dir = data_output_dir
+        os.makedirs(self.data_output_dir, exist_ok=True)
         self.history = []
-        self.class_names = class_names
+        self.class_names = class_names if class_names is not None else []
         self.name = name
-        
-    
+        self.transform_name = transform_name
+
     def log_report(self, report):
         """Log report for one epoch"""
-        class_f1s_dict = {class_name: report[class_name]['f1-score'] for class_name in self.class_names}
-        class_precisions_dict = {class_name: report[class_name]['precision'] for class_name in self.class_names}
-        class_recalls_dict = {class_name: report[class_name]['recall'] for class_name in self.class_names}
-        report['class_f1s'] = class_f1s_dict
-        report['class_precisions'] = class_precisions_dict
-        report['class_recalls'] = class_recalls_dict
+        class_f1s_dict = {
+            class_name: report[class_name]["f1-score"]
+            for class_name in self.class_names
+        }
+        class_precisions_dict = {
+            class_name: report[class_name]["precision"]
+            for class_name in self.class_names
+        }
+        class_recalls_dict = {
+            class_name: report[class_name]["recall"] for class_name in self.class_names
+        }
+        report["class_f1s"] = class_f1s_dict
+        report["class_precisions"] = class_precisions_dict
+        report["class_recalls"] = class_recalls_dict
         self.history.append(report)
         # print(f"Report: {report}")  # Too verbose - removed
         # self.print_log(report)
         
     def print_log(self, report):
-        print(f"\n[METRICS] epoch={report['epoch']} {self.name}_loss={report['loss']:.4f} {self.name}_acc={report['acc']:.4f}")
-        
-        # Key metrics
+        print(
+            f"\n[METRICS] epoch={report['epoch']} {self.name}_loss={report['loss']:.4f} "
+            f"{self.name}_acc={report['acc']:.4f}"
+        )
+
         print(f"  Top-3 Accuracy: {report.get('top3_accuracy', 0):.4f}")
         print(f"  Log Loss: {report.get('log_loss', 0):.4f}")
-        
-        # Aggregated metrics (safely handle missing keys)
-        if 'micro avg' in report:
-            micro_avg = report['micro avg']
-            print(f"\n  Micro Avg    - F1: {micro_avg['f1-score']:.4f}, Precision: {micro_avg['precision']:.4f}, Recall: {micro_avg['recall']:.4f}")
-        
-        if 'macro avg' in report:
-            macro_avg = report['macro avg']
-            print(f"  Macro Avg    - F1: {macro_avg['f1-score']:.4f}, Precision: {macro_avg['precision']:.4f}, Recall: {macro_avg['recall']:.4f}")
-        
-        if 'weighted avg' in report:
-            weighted_avg = report['weighted avg']
-            print(f"  Weighted Avg - F1: {weighted_avg['f1-score']:.4f}, Precision: {weighted_avg['precision']:.4f}, Recall: {weighted_avg['recall']:.4f}")
-        
-        # Per-class F1 scores
-        if 'class_f1s' in report and self.class_names:
-            print(f"\n  Per-Class F1 Scores:")
-            for class_name in self.class_names:
-                f1 = report.get('class_f1s', {}).get(class_name, 0)
-                conf = report.get('class_confidences', {}).get(class_name, 0)
-                print(f"    {class_name:20s}: F1={f1:.4f}, Confidence={conf:.4f}")
-    
-    def save(self, epoche):
-        """Save complete history to JSON with proper handling of numpy types"""
-        
-        print(f"Saving metrics to {self.output_dir}")
-        
-        # Custom JSON encoder to handle numpy types
 
-        
-        # Clean up history for JSON serialization
+        if "macro avg" in report:
+            macro_avg = report["macro avg"]
+            print(
+                f"  Macro Avg    - F1: {macro_avg['f1-score']:.4f}, "
+                f"Precision: {macro_avg['precision']:.4f}, Recall: {macro_avg['recall']:.4f}"
+            )
+
+        if "weighted avg" in report:
+            weighted_avg = report["weighted avg"]
+            print(
+                f"  Weighted Avg - F1: {weighted_avg['f1-score']:.4f}, "
+                f"Precision: {weighted_avg['precision']:.4f}, Recall: {weighted_avg['recall']:.4f}"
+            )
+
+        if "class_f1s" in report and self.class_names:
+            print("\n  Per-Class F1 Scores:")
+            for class_name in self.class_names:
+                f1 = report.get("class_f1s", {}).get(class_name, 0)
+                conf = report.get("class_confidences", {}).get(class_name, 0)
+                print(f"    {class_name:20s}: F1={f1:.4f}, Confidence={conf:.4f}")
+
+    def save_data_metrics(self, epoch):
+        """Save complete history to JSON with proper handling of numpy types"""
+
+        print(f"Saving metrics to {self.data_output_dir}")
+
         clean_history = []
         for report in self.history:
             clean_report = copy.deepcopy(report)
-            
-            # Remove or convert non-JSON-serializable items
-            if 'ids' in clean_report:
-                # Remove ids from JSON (too large, not useful for analysis)
-                del clean_report['ids']
-            
-            if 'misclassified_images' in clean_report:
-                # Convert DataFrame to dict for JSON
-                if hasattr(clean_report['misclassified_images'], 'to_dict'):
-                    clean_report['misclassified_images'] = clean_report['misclassified_images'].to_dict('records')
-            
-            # Ensure micro avg, macro avg, weighted avg are present
-            # (classification_report should include these automatically)
-            
+
+            if "ids" in clean_report:
+                del clean_report["ids"]
+
+            if "misclassified_images" in clean_report:
+                if hasattr(clean_report["misclassified_images"], "to_dict"):
+                    clean_report["misclassified_images"] = clean_report[
+                        "misclassified_images"
+                    ].to_dict("records")
+
             clean_history.append(clean_report)
-        
-        # Save as JSON only (not CSV)
-        json_path = os.path.join(self.output_dir, f'{self.name}_metrics_{epoche}.json')
-        with open(json_path, 'w') as f:
+
+        json_path = os.path.join(
+            self.data_output_dir, f"{self.name}_metrics_{epoch}.json"
+        )
+        with open(json_path, "w") as f:
             json.dump(clean_history, f, indent=2, cls=NumpyEncoder)
-        
-        print(f"✓ Metrics saved to {self.output_dir}")
+
+        if clean_history:
+            keys = list(clean_history[0].keys())
+            df = pd.DataFrame(columns=keys)
+            for report in clean_history:
+                row = pd.DataFrame([report])
+                df = pd.concat([df, row], ignore_index=True)
+            df.to_csv(
+                os.path.join(self.data_output_dir, f"{self.name}_metrics_{epoch}.csv"),
+                index=False,
+            )
+
+        print(f"✓ Metrics saved to {self.data_output_dir}")
         print(f"  - {json_path}")
         print(f"  Total epochs logged: {len(clean_history)}")
 
-        
+
+def model_compose(num_classes):
+    all_models = {
+        "model_convnextv2_huge.fcmae_ft_in22k_in1k_384": {
+            "img_size": 384,
+            "model": timm.create_model(
+                "convnextv2_huge.fcmae_ft_in22k_in1k_384",
+                pretrained=True,
+                num_classes=num_classes,
+            ),
+        },
+        "model_convnext_xxlarge.clip_laion2b_soup_ft_in1k": {
+            "img_size": 224,
+            "model": timm.create_model(
+                "convnext_xxlarge.clip_laion2b_soup_ft_in1k",
+                pretrained=True,
+                num_classes=num_classes,
+            ),
+        },
+        "model_convnext_large.fb_in22k_ft_in1k": {
+            "img_size": 224,
+            "model": timm.create_model(
+                "convnext_large.fb_in22k_ft_in1k",
+                pretrained=True,
+                num_classes=num_classes,
+            ),
+        },
+    }
+    return all_models
+
+
+def transforms_compose(img_size):
+    """Create augmentation transforms with the specified image size"""
+    all_transforms = {
+        "transform_1": A.Compose(
+            [
+                A.Resize(height=img_size + 20, width=img_size + 20, p=1.0),
+                A.RandomCrop(height=img_size, width=img_size),
+                A.HorizontalFlip(p=0.5),
+                A.VerticalFlip(p=0.2),
+                A.Rotate(limit=20, p=0.5),
+                A.Affine(
+                    translate_percent=0.1, scale=(0.8, 1.2), rotate=(-30, 30), p=0.5
+                ),
+                A.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),
+                A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+                ToTensorV2(),
+            ]
+        ),
+        "transform_2": A.Compose(
+            [
+                A.RandomResizedCrop(size=(img_size, img_size), scale=(0.8, 1.0)),
+                A.HorizontalFlip(p=0.5),
+                A.VerticalFlip(p=0.2),
+                A.RandomRotate90(p=0.5),
+                A.ShiftScaleRotate(
+                    shift_limit=0.1, scale_limit=0.2, rotate_limit=30, p=0.5
+                ),
+                A.OneOf(
+                    [
+                        A.GaussNoise(std_range=(0.1, 0.2)),
+                        A.GaussianBlur(blur_limit=7),
+                        A.MotionBlur(blur_limit=7),
+                    ],
+                    p=0.3,
+                ),
+                A.OneOf(
+                    [
+                        A.OpticalDistortion(distort_limit=0.1),
+                        A.GridDistortion(distort_limit=0.1),
+                    ],
+                    p=0.2,
+                ),
+                A.CoarseDropout(
+                    num_holes_range=(1, 8),
+                    hole_height_range=(8, 32),
+                    hole_width_range=(8, 32),
+                    p=0.3,
+                ),
+                A.ColorJitter(
+                    brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1, p=0.5
+                ),
+                A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+                ToTensorV2(),
+            ]
+        ),
+    }
+    return all_transforms
+
+
+def get_test_transform(img_size):
+    """Create test/validation transform using Albumentations"""
+    return A.Compose(
+        [
+            A.Resize(height=img_size, width=img_size),
+            A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+            ToTensorV2(),
+        ]
+    )
+
+
+def save_model(model, models_dir, model_name, key, epoch):
+    """Save model to models_dir/model_name_key_model_epoch.pth"""
+    os.makedirs(models_dir, exist_ok=True)
+    model_path = os.path.join(models_dir, f"{model_name}_{key}_model_{epoch}.pth")
+    torch.save(model.state_dict(), model_path)
+    print(f"✓ Model saved to {model_path}")
+    return model_path
+
+
+def compute_test_model(
+    model,
+    models_dir,
+    model_name,
+    key,
+    from_epoch,
+    device,
+    class_names,
+    batch_size,
+    num_cpu,
+    test_img_size,
+    test_folder,
+    test_df,
+    test_output_dir,
+):
+    """Run inference on test set and save predictions"""
+    model_path = os.path.join(
+        models_dir, f"{model_name}_{key}_model_{from_epoch}.pth"
+    )
+    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.eval()
+
+    # Use Albumentations transform for test (matches training pipeline)
+    test_transform = get_test_transform(test_img_size)
+
+    test_dataset = AnimalDatasetTest(
+        test_df, transform=test_transform, folder=test_folder, img_size=test_img_size
+    )
+    test_loader = DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_cpu
+    )
+
+    rows = []
+    os.makedirs(test_output_dir, exist_ok=True)
+
+    pbar = tqdm(test_loader, total=len(test_loader), desc="Testing")
+    for batch_idx, (images, ids) in enumerate(pbar):
+        images = images.to(device)
+
+        with torch.no_grad():
+            outputs = model(images)
+            probs = torch.softmax(outputs, dim=1)
+
+        probs = probs.cpu().numpy()
+
+        for i in range(len(ids)):
+            rows.append([ids[i], *probs[i]])
+
+    submission_df = pd.DataFrame(rows, columns=["id"] + class_names)
+    output_path = os.path.join(test_output_dir, f"submission_{from_epoch}.csv")
+    submission_df.to_csv(output_path, index=False)
+    print(f"✓ Test predictions saved to {output_path}")
 
 
 if __name__ == "__main__":
@@ -697,19 +792,25 @@ if __name__ == "__main__":
     )
     
     # Training hyperparameters
-    parser.add_argument("--epochs", type=int, default=5,
-                        help="Number of training epochs")
-    parser.add_argument("--batch-size", type=int, default=16,
-                        help="Batch size for training")
-    parser.add_argument("--learning-rate", type=float, default=0.001,
-                        help="Learning rate for optimizer")
-    parser.add_argument("--weight-decay", type=float, default=0.01,
-                        help="Weight decay (L2 regularization)")
-    parser.add_argument("--image-size", type=int, default=224,
-                        help="Input image size (224 or 384)")
-    parser.add_argument("--stochastic-depth", type=float, default=0.1,
-                        help="Stochastic depth drop rate (for Swin Transformer)")
-    
+    parser.add_argument(
+        "--epochs", type=int, default=5, help="Number of training epochs"
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=16, help="Batch size for training"
+    )
+    parser.add_argument(
+        "--learning-rate", type=float, default=0.001, help="Learning rate for optimizer"
+    )
+    parser.add_argument(
+        "--weight-decay",
+        type=float,
+        default=0.01,
+        help="Weight decay (L2 regularization)",
+    )
+    parser.add_argument(
+        "--image-size", type=int, default=224, help="Input image size (224 or 384)"
+    )
+
     # System configuration
     parser.add_argument("--use-cuda", type=lambda x: (str(x).lower() == 'true'), default=True,
                         help="Use CUDA if available (true/false)")
@@ -738,9 +839,13 @@ if __name__ == "__main__":
                         help="Directory to save metrics and logs")
     
     # Model saving
-    parser.add_argument("--save-file", type=str, default="final_swin-b_model.pth",
-                        help="Filename for final saved model")
-    
+    parser.add_argument(
+        "--save-file",
+        type=str,
+        default="final_model.pth",
+        help="Filename for final saved model",
+    )
+
     args = parser.parse_args()
     
     print(f"Arguments: {args}")
@@ -801,44 +906,10 @@ if __name__ == "__main__":
     print(f"Initial RAM usage: {get_ram_usage():.2f} MB")
     if torch.cuda.is_available():
         gpu_alloc, gpu_reserved = get_gpu_memory()
-        print(f"Initial GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB")
-    
-    
+        print(
+            f"Initial GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB"
+        )
 
-    
-    # train_transform = transforms.Compose(
-    #     [
-    #         transforms.RandomRotation(degrees=(0, 30), fill=128),
-    #         transforms.Resize((img_size, img_size)),
-    #         transforms.RandomHorizontalFlip(p=0.4),
-    #         transforms.ColorJitter(brightness=(0.7, 1.2), contrast=(0.7, 1.2), saturation=(0.7, 1.2)),
-    #         transforms.ToTensor(),
-    #         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    #         # transforms.RandomErasing(),
-    #     ]
-    # )
-    train_transform = transforms.Compose(
-        [
-            transforms.Resize((img_size, img_size)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            # transforms.RandomErasing(),
-        ]
-    )
-    val_transform = transforms.Compose(
-        [
-            transforms.Resize((img_size, img_size)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            # transforms.RandomErasing(),
-        ]
-    )
-    
-
-    
-    # print(f"Train transform: {train_transform}")
-    print(f"Val transform: {val_transform}")
-    
     base_path = args.data_dir
     print(f"Base path: {base_path}")
     
@@ -882,189 +953,178 @@ if __name__ == "__main__":
         dataframe,
         test_size=0.25,
         random_state=42,
-        stratify=np.argmax(dataframe[class_names].values, axis=1), # type: ignore
+        stratify=np.argmax(dataframe[class_names].values, axis=1),
     )
-   
-    
-    train_dataset = AnimalDatasetSwin(train_df, transform=train_transform, folder=train_folder, img_size=img_size)
-    val_dataset = AnimalDatasetSwin(val_df, transform=val_transform, folder=train_folder, img_size=img_size)
-
-    print(f"After creating datasets RAM usage: {get_ram_usage():.2f} MB")
-    if torch.cuda.is_available():
-        gpu_alloc, gpu_reserved = get_gpu_memory()
-        print(f"After creating datasets GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB")
 
     batch_size = args.batch_size
-    train_loader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=args.num_cpu
-    )
-    val_loader = DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=False, num_workers=args.num_cpu
-    )
-    
     print(f"Batch size: {batch_size}")
-    print(f"Train batches: {len(train_loader)}")
-    print(f"Val batches: {len(val_loader)}")
-    
-    # Load model
-    # model = models.swin_t(weights=None)
-    
-    # ResNet18 Model
-    # model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
-    # model.fc = nn.Linear(model.fc.in_features, num_classes)
-    print("SwinB Model")
-    model = swin_b(weights=Swin_B_Weights.IMAGENET1K_V1)
-    model.head = nn.Linear(model.head.in_features, num_classes)
-    
-    # print("Initializing Swin Transformer architecture...")
-    # model = models.swin_t(weights=None) 
-    
-    # # 2. Manually adjust Stochastic Depth (The workaround)
-    # if args.stochastic_depth != 0.2:
-    #     print(f"Adjusting Stochastic Depth to {args.stochastic_depth}...")
-    #     for module in model.modules():
-    #         if isinstance(module, StochasticDepth):
-    #             module.p = args.stochastic_depth
 
-    # 3. Setup the Head
-    # model.head = nn.Linear(model.head.in_features, num_classes)
-    
-    # # 4. LOAD CHECKPOINT
-    # checkpoint_dir = os.environ.get("SM_CHANNEL_MODEL")
-    
-    # print(f"Checking directory: {checkpoint_dir}")
-    # if os.path.exists(checkpoint_dir):
-    #     files_in_dir = os.listdir(checkpoint_dir) # type: ignore
-    #     print("Files found in checkpoint directory:", files_in_dir)
-        
-    #     # === FIX: AUTO-EXTRACT TAR.GZ ===
-    #     if "model.tar.gz" in files_in_dir:
-    #         print("Found model.tar.gz! Extracting...")
-    #         tar_path = os.path.join(checkpoint_dir, "model.tar.gz")
-    #         try:
-    #             with tarfile.open(tar_path, "r:gz") as tar:
-    #                 tar.extractall(path=checkpoint_dir)
-    #             print("✓ Extraction complete.")
-    #             print("New directory contents:", os.listdir(checkpoint_dir))
-    #         except Exception as e:
-    #             print(f"Extraction failed: {e}")
-    #     # =================================
-
-    # else:
-    #     print("Checkpoint directory does not exist!")
-
-    # # Now look for the .pth file (it should be extracted now)
-    # checkpoint_name = "final_swin_t_model_part1_best.pth"
-    # checkpoint_path = os.path.join(checkpoint_dir, checkpoint_name)
-    
-    
-    # further_train = False
-    
-    # if os.path.exists(checkpoint_path) and further_train:
-    #     print(f"LOADING STAGE 1 WEIGHTS FROM: {checkpoint_path}")
-    #     state_dict = torch.load(checkpoint_path, map_location=device)
-    #     model.load_state_dict(state_dict)
-    #     print("✓ Successfully loaded Stage 1 weights.")
-    # else:
-    #     print(f"⚠️  WARNING: Could not find {checkpoint_name} even after extraction.")
-    #     print("Available files:", os.listdir(checkpoint_dir))
-    #     print("Falling back to ImageNet-1K weights (Training from Scratch).")
-        
-    #     # Fallback logic
-    #     imagenet_model = models.swin_t(weights=Swin_T_Weights.IMAGENET1K_V1)
-    #     # Transfer weights logic if needed...
-    #     model.features = imagenet_model.features
-    #     model.norm = imagenet_model.norm
-    #     model.permute = imagenet_model.permute
-
-    model = model.to(device)
-    
-   
-    print(f"Model head: {model.head}")
-    print()
-    print(f"After moving model to GPU RAM usage: {get_ram_usage():.2f} MB")
     if torch.cuda.is_available():
         gpu_alloc, gpu_reserved = get_gpu_memory()
-        print(f"After moving to GPU - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB")
-    
-    # Mixup configuration (currently disabled)
-    mixup_enabled = False
-    
-    optimizer = optim.AdamW(model.parameters(), lr=args.learning_rate) # weight_decay=args.weight_decay 
-    print(f"Optimizer: {optimizer}")
-    criterion = nn.CrossEntropyLoss()
-    print(f"Criterion: {criterion}")
-    print(f"Total Epochs: {args.epochs}")
-    scheduler = CosineAnnealingLR(optimizer, T_max=args.epochs)
-    print(f"Scheduler: {scheduler}")
-    
-    model.train()
-    best_val_acc = 0.0
-    print(f"After loading model RAM usage: {get_ram_usage():.2f} MB")
+        print(
+            f"After creating datasets GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB"
+        )
 
-    # scaler = GradScaler()
-    
-    train_logger = TrainingLogger(output_dir=args.model_dir,  class_names=class_names, name="train")
-    val_logger = TrainingLogger(output_dir=args.model_dir, class_names=class_names, name="val")
-    
-    for epoch in range(args.epochs):
-        print(f"Epoch {epoch+1}/{args.epochs}")
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()  # Clear cache before each epoch
-            gpu_alloc, gpu_reserved = get_gpu_memory()
-            print(f"Start of epoch GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB")
-        
-        train_acc, train_report = train_epoch(model, train_loader, criterion, optimizer, device, num_classes=num_classes, class_names = class_names)
-        train_report['epoch'] = epoch
-        train_logger.log_report(train_report)
-        train_logger.print_log(train_report)  # Already called inside log_report
-        
-        if torch.cuda.is_available():
-            gpu_alloc, gpu_reserved = get_gpu_memory()
-            print(f"After training GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB")
-        
-        val_acc, val_report = validate_epoch(model, val_loader, criterion, device, class_names = class_names)
-        val_report['epoch'] = epoch
-        lr_before = scheduler.get_last_lr()[0]
-        scheduler.step()
-        lr_after = scheduler.get_last_lr()[0]
-        val_report['lr_before'] = lr_before
-        val_report['lr_after'] = lr_after
-        val_logger.log_report(val_report)
-        val_logger.print_log(val_report)  # Already called inside log_report
-    
-        
-        print(f"Learning Rate: {lr_before:.6f} → {lr_after:.6f}")
-        
-        if torch.cuda.is_available():
-            gpu_alloc, gpu_reserved = get_gpu_memory()
-            print(f"After validation GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB")
+    best_val_acc = {}
 
-        if val_acc > best_val_acc:
-            best_val_acc = val_acc
-            best_file_name = args.save_file.split(".")[0] + f"_{epoch}_best.pth"
-            print(f"Saving best model to {best_file_name} with val acc {val_acc:.4f}")
-            save_path = os.path.join(args.model_dir, best_file_name)
-            torch.save(model.state_dict(), save_path)
-            print(f"✓ Best model saved! (Val Acc: {val_acc:.4f}), path: {save_path}")
-            train_logger.save(epoch)
-            val_logger.save(epoch)
+    models_dict = model_compose(num_classes)
+    for model_name, model_config in models_dict.items():
+        current_img_size = model_config["img_size"]
+        model = model_config["model"].to(device)
+        model.train()
 
+        print(f"\n{'='*60}")
+        print(f"Model: {model_name}")
+        print(f"Image size: {current_img_size}")
+        print(f"{'='*60}")
 
-    train_logger.save(args.epochs+100)
-    val_logger.save(args.epochs+100)
+        optimizer = optim.AdamW(model.parameters(), lr=args.learning_rate)
+        criterion = nn.CrossEntropyLoss()
+        scheduler = CosineAnnealingLR(optimizer, T_max=args.epochs)
 
-    # dict_scheduler = scheduler.state_dict()
-    # print(f"Scheduler state dict: {dict_scheduler}")
-    
-    # json_path = os.path.join(args.model_dir, f'scheduler_metrics.json')
-    # with open(json_path, 'w') as f:
-    #     json.dump(dict_scheduler, f, indent=2)  
-    
-    print("Saving final model with this name: ", args.save_file)
-    save_path = os.path.join(args.model_dir, args.save_file)
-    torch.save(model.state_dict(), save_path)
-    print(f"Model saved to {save_path}")
-    
-    
-    
+        # Create transforms for this model's image size
+        augmentation_transform = transforms_compose(current_img_size)
+
+        for transform_key, transform_each in augmentation_transform.items():
+            print(f"\n--- Transform: {transform_key} ---")
+
+            train_dataset = AnimalDatasetConvnext(
+                train_df,
+                transform=transform_each,
+                folder=train_folder,
+                img_size=current_img_size,
+            )
+            val_dataset = AnimalDatasetConvnext(
+                val_df,
+                transform=transform_each,
+                folder=train_folder,
+                img_size=current_img_size,
+            )
+            train_loader = DataLoader(
+                train_dataset,
+                batch_size=batch_size,
+                shuffle=True,
+                num_workers=args.num_cpu,
+            )
+            val_loader = DataLoader(
+                val_dataset,
+                batch_size=batch_size,
+                shuffle=False,
+                num_workers=args.num_cpu,
+            )
+
+            print(f"Train batches: {len(train_loader)}")
+            print(f"Val batches: {len(val_loader)}")
+            print(f"After loading model RAM usage: {get_ram_usage():.2f} MB")
+
+            # Directory structure: model_dir/model_name/transform_key/{models,data,test}
+            base_dir = os.path.join(args.model_dir, model_name, transform_key)
+            models_dir = os.path.join(base_dir, "models")
+            data_dir = os.path.join(base_dir, "data")
+            test_dir = os.path.join(base_dir, "test")
+
+            os.makedirs(models_dir, exist_ok=True)
+            os.makedirs(data_dir, exist_ok=True)
+            os.makedirs(test_dir, exist_ok=True)
+
+            print(f"\n📁 Output Structure:")
+            print(f"   Base: {base_dir}")
+            print(f"   Models: {models_dir}")
+            print(f"   Data (JSON/CSV): {data_dir}")
+            print(f"   Test: {test_dir}")
+
+            train_logger = TrainingLogger(
+                data_output_dir=data_dir,
+                class_names=class_names,
+                name=f"train",
+                transform_name=transform_key,
+            )
+            val_logger = TrainingLogger(
+                data_output_dir=data_dir,
+                class_names=class_names,
+                name=f"val",
+                transform_name=transform_key,
+            )
+
+            from_epoch = 0
+            best_val = 0.0
+
+            for epoch in range(args.epochs):
+                print(f"\nEpoch {epoch+1}/{args.epochs}")
+
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    gpu_alloc, gpu_reserved = get_gpu_memory()
+                    print(
+                        f"Start of epoch GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB"
+                    )
+
+                train_acc, train_report = train_epoch(
+                    model,
+                    train_loader,
+                    criterion,
+                    optimizer,
+                    device,
+                    num_classes=num_classes,
+                    class_names=class_names,
+                )
+                train_report["epoch"] = epoch
+                train_logger.log_report(train_report)
+                train_logger.print_log(train_report)
+
+                if torch.cuda.is_available():
+                    gpu_alloc, gpu_reserved = get_gpu_memory()
+                    print(
+                        f"After training GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB"
+                    )
+
+                val_acc, val_report = validate_epoch(
+                    model, val_loader, criterion, device, class_names=class_names
+                )
+                val_report["epoch"] = epoch
+                lr_before = scheduler.get_last_lr()[0]
+                scheduler.step()
+                lr_after = scheduler.get_last_lr()[0]
+                val_report["lr_before"] = lr_before
+                val_report["lr_after"] = lr_after
+                val_logger.log_report(val_report)
+                val_logger.print_log(val_report)
+
+                print(f"Learning Rate: {lr_before:.6f} → {lr_after:.6f}")
+
+                if torch.cuda.is_available():
+                    gpu_alloc, gpu_reserved = get_gpu_memory()
+                    print(
+                        f"After validation GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB"
+                    )
+
+                if val_acc > best_val:
+                    from_epoch = epoch
+                    best_val = val_acc
+                    print(f"New best validation accuracy: {val_acc:.4f}")
+                    save_model(model, models_dir, model_name, transform_key, epoch)
+
+            # Save final metrics and model
+            final_epoch_marker = args.epochs + 100
+            train_logger.save_data_metrics(final_epoch_marker)
+            val_logger.save_data_metrics(final_epoch_marker)
+            save_model(model, models_dir, model_name, transform_key, final_epoch_marker)
+
+            # Run test inference
+            compute_test_model(
+                model,
+                models_dir,
+                model_name,
+                transform_key,
+                from_epoch,
+                device,
+                class_names,
+                batch_size,
+                args.num_cpu,
+                current_img_size,
+                test_folder,
+                dataframe_test,
+                test_dir,
+            )
+
+    print("\n✓ Training complete!")
