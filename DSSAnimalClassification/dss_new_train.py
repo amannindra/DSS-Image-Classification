@@ -80,8 +80,8 @@ class AnimalDatasetConvnext(Dataset):
         return len(self.dataframe)
 
     def __getitem__(self, idx):
-        id = self.dataframe.iloc[idx]["id"]
-        filename = id + ".jpg"
+        img_id = self.dataframe.iloc[idx]["id"]
+        filename = img_id + ".jpg"
         image_path = os.path.join(self.folder, filename)
 
         try:
@@ -99,9 +99,9 @@ class AnimalDatasetConvnext(Dataset):
             transformed_image = self.transform(image=image)
             done_image = transformed_image["image"]
         else:
-            done_image = np.zeros((self.img_size, self.img_size, 3), dtype=np.uint8)
+            done_image = torch.zeros((3, self.img_size, self.img_size), dtype=torch.float32)
 
-        return done_image, self.labels[idx], self.dataframe.iloc[idx]["id"]
+        return done_image, self.labels[idx], img_id
 
     def get_y(self):
         return self.labels
@@ -155,7 +155,8 @@ class NumpyEncoder(json.JSONEncoder):
         return super().default(o)
 
 def train_epoch(
-    model, dataloader, criterion, optimizer, device, class_names, num_classes=8, epoch=0, total_epochs=1
+    model, dataloader, criterion, optimizer, device, scaler, class_names, num_classes=8, epoch=0, total_epochs=1
+    
 ):
     model.train()
     running_loss = 0.0
@@ -186,10 +187,15 @@ def train_epoch(
         images, labels = images.to(device), labels.to(device)
 
         optimizer.zero_grad()
-        outputs = model(images)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
+        with autocast(enabled=(device.type == "cuda")):
+            outputs = model(images)
+            loss = criterion(outputs, labels)
+            
+            
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
+
 
         running_loss += loss.item() * images.size(0)
 
@@ -220,18 +226,20 @@ def train_epoch(
     all_labels = np.array(all_labels)
     all_preds = np.array(all_preds)
 
-    misclassified_images = pd.DataFrame(
-        columns=["id", "true_label", "predicted_label", "probability"]
-    )
+
+    misclassified_list = []
+
     for i, id in enumerate(all_ids):
         if all_preds[i] != all_labels[i]:
-            misclassified_images.loc[len(misclassified_images)] = {
+            misclassified_list.append({
                 "id": id,
                 "true_label": class_names[all_labels[i]],
                 "predicted_label": class_names[all_preds[i]],
                 "probability": all_probs[i][all_preds[i]],
-            }
+            })
 
+    misclassified_images = pd.DataFrame(misclassified_list)
+    
     report = classification_report(
         all_labels,
         all_preds,
@@ -598,11 +606,11 @@ def transforms_compose(img_size):
                 A.RandomResizedCrop(size=(img_size, img_size), scale=(0.8, 1.0)),
                 A.HorizontalFlip(p=0.5),
                 A.VerticalFlip(p=0.2),
-                A.RandomRotate90(p=0.5),
+                A.RandomRotate90(p=0.2),
                 A.ShiftScaleRotate(
                     shift_limit=0.1, scale_limit=0.2, rotate_limit=30, p=0.5
                 ),
-                A.OneOf(
+                A.OneOf(    
                     [
                         A.GaussNoise(std_range=(0.1, 0.2)),
                         A.GaussianBlur(blur_limit=7),
@@ -630,8 +638,40 @@ def transforms_compose(img_size):
                 ToTensorV2(),
             ]
         ),
+        "transform_3": A.Compose(
+            [
+                A.RandomResizedCrop(size=(img_size, img_size), scale=(0.8, 1.0)),
+                A.HorizontalFlip(p=0.5),
+                A.VerticalFlip(p=0.2),
+                A.RandomRotate90(p=0.2),
+                A.OneOf(
+                    [
+                        A.OpticalDistortion(distort_limit=0.1),
+                        A.GridDistortion(distort_limit=0.1),
+                    ],
+                    p=0.2,
+                ),
+                A.OneOf([
+                    A.GaussianBlur(p=0.7),
+                    A.MedianBlur(p=0.7),
+                    A.MotionBlur(p=0.7),
+                ], p=0.5),
+                A.InvertImg(p=0.2),
+                A.Posterize(p=0.2),
+                A.CLAHE(p=0.2),
+                A.PlasmaShadow(
+                    shadow_intensity_range=(0.3, 0.5),
+                    plasma_size=img_size,
+                    roughness=3,
+                    p=0.2 
+                ),
+                A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+                ToTensorV2(),
+            ]
+        )
     }
     return all_transforms
+
 
 
 def get_test_transform(img_size):
@@ -740,28 +780,28 @@ if __name__ == "__main__":
                         help="Use CUDA if available (true/false)")
     parser.add_argument("--num-cpu", type=int, default=4,
                         help="Number of CPU workers for data loading")
-    
+
     # Data paths - Works for both Local and SageMaker
     # SageMaker: Uses SM_CHANNEL_TRAINING env var
     # Local: Defaults to ./data
     parser.add_argument("--data-dir", type=str, 
                         default=os.environ.get("SM_CHANNEL_TRAINING", "./data"),
                         help="Directory containing training data (train_labels.csv and train_features/)")
-    
+
     # Model directory - Works for both Local and SageMaker
     # SageMaker: Uses SM_MODEL_DIR env var (auto-uploaded to S3)
     # Local: Defaults to ./models
     parser.add_argument("--model-dir", type=str, 
                         default=os.environ.get("SM_MODEL_DIR", "./models"),
                         help="Directory to save trained models")
-    
+
     # Output directory - Works for both Local and SageMaker
     # SageMaker: Uses SM_OUTPUT_DATA_DIR env var (metrics uploaded to S3)
     # Local: Defaults to ./output
     parser.add_argument("--output-dir", type=str,
                         default=os.environ.get("SM_OUTPUT_DATA_DIR", "./output"),
                         help="Directory to save metrics and logs")
-    
+
     # Model saving
     parser.add_argument(
         "--save-file",
@@ -870,7 +910,7 @@ if __name__ == "__main__":
     train_labels = np.argmax(train_df[class_names].values, axis=1)
     class_counts = np.bincount(train_labels, minlength=num_classes)
     total_samples = len(train_labels)
-    
+
     # Inverse frequency weighting: weight = total_samples / (num_classes * class_count)
     class_weights = total_samples / (num_classes * class_counts + 1e-6)
     class_weights = torch.tensor(class_weights, dtype=torch.float32).to(device)
@@ -900,7 +940,7 @@ if __name__ == "__main__":
         print(f"{'='*60}")
         print(f"   Image size: {current_img_size}x{current_img_size}")
         print(f"   TIMM model: {timm_name}")
-        
+
         criterion = nn.CrossEntropyLoss(weight=class_weights)
 
         # Create transforms for this model's image size
@@ -912,8 +952,7 @@ if __name__ == "__main__":
             print(f"\n{'▓'*60}")
             print(f"📦 TRANSFORM {transform_idx+1}/{num_transforms}: {transform_key}")
             print(f"{'▓'*60}")
-            
-            # Create a FRESH model with pretrained weights for each transform
+
             print(f"\n🔄 Creating fresh model (pretrained weights)...")
             model = create_model(timm_name, num_classes, device)
             model.train()
@@ -929,14 +968,14 @@ if __name__ == "__main__":
             )
             val_dataset = AnimalDatasetConvnext(
                 val_df,
-                transform=transform_each,
+                transform=get_test_transform(current_img_size),
                 folder=train_folder,
                 img_size=current_img_size,
             )
-            
+
             print(f"   Train dataset size: {len(train_dataset)}")
             print(f"   Val dataset size: {len(val_dataset)}")
-            
+
             print(f"\n🔧 Creating dataloaders...")
             train_loader = DataLoader(
                 train_dataset,
@@ -988,11 +1027,12 @@ if __name__ == "__main__":
 
             from_epoch = 0
             best_val = 0.0
-            
+
             # Reset optimizer and scheduler for each transform
             optimizer = optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
+            scaler = GradScaler()
             scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=args.epochs)
-            
+
             print(f"\n🎯 Starting training loop: {args.epochs} epochs")
             print(f"   Initial LR: {args.learning_rate}")
             print(f"   Scheduler: CosineAnnealingWarmRestarts (T_0={args.epochs})")
@@ -1001,7 +1041,7 @@ if __name__ == "__main__":
                 print(f"\n{'═'*60}")
                 print(f"🔄 EPOCH {epoch+1}/{args.epochs} | Model: {model_name[:30]}... | Transform: {transform_key}")
                 print(f"{'═'*60}")
-                
+
                 current_lr = optimizer.param_groups[0]['lr']
                 print(f"   Current Learning Rate: {current_lr:.8f}")
 
@@ -1017,13 +1057,18 @@ if __name__ == "__main__":
                     criterion,
                     optimizer,
                     device,
+                    scaler,
+                    class_names,
                     num_classes=num_classes,
-                    class_names=class_names,
                     epoch=epoch,
                     total_epochs=args.epochs,
                 )
+               
+
                 train_report["epoch"] = epoch
                 train_logger.log_report(train_report)
+                
+                
 
                 if torch.cuda.is_available():
                     gpu_alloc, gpu_reserved = get_gpu_memory()
@@ -1034,20 +1079,20 @@ if __name__ == "__main__":
                     epoch=epoch, total_epochs=args.epochs
                 )
                 val_report["epoch"] = epoch
-                
+
                 lr_before = scheduler.get_last_lr()[0]
                 scheduler.step()
                 lr_after = scheduler.get_last_lr()[0]
                 val_report["lr_before"] = lr_before
                 val_report["lr_after"] = lr_after
-                
+
                 print(f"\n   📈 LR Update: {lr_before:.8f} → {lr_after:.8f}")
                 val_logger.log_report(val_report)
 
-                if torch.cuda.is_available():
+                if torch.cuda.is_available():   
                     gpu_alloc, gpu_reserved = get_gpu_memory()
                     print(f"   🖥️  Post-val GPU: Allocated={gpu_alloc:.2f} MB, Reserved={gpu_reserved:.2f} MB")
-                
+
                 # Epoch summary
                 print(f"\n   {'─'*50}")
                 print(f"   📋 EPOCH {epoch+1} SUMMARY:")
@@ -1068,7 +1113,7 @@ if __name__ == "__main__":
             print(f"✅ TRAINING COMPLETE for {transform_key}")
             print(f"{'▓'*60}")
             print(f"   Best validation accuracy: {best_val:.4f} (Epoch {from_epoch+1})")
-            
+
             # Save final metrics and model
             print(f"\n💾 Saving final metrics and model...")
             final_epoch_marker = args.epochs + 100
@@ -1094,7 +1139,7 @@ if __name__ == "__main__":
                 test_dir,
             )
             print(f"✅ Test inference complete!")
-            
+
             # Clean up model to free GPU memory before next transform
             print(f"\n🧹 Cleaning up model and freeing memory...")
             del model
