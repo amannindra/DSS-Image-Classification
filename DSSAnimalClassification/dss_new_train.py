@@ -556,16 +556,17 @@ def model_compose():
     all_models = {
         "model_convnextv2_huge.fcmae_ft_in22k_in1k_384": {
             "img_size": 384,
+            "batch_size": 8,
             "timm_name": "convnextv2_huge.fcmae_ft_in22k_in1k_384",
+            "parameters": 700000000
         },
-        "model_convnext_xxlarge.clip_laion2b_soup_ft_in1k": {
-            "img_size": 224,
-            "timm_name": "convnext_xxlarge.clip_laion2b_soup_ft_in1k",
-        },
-        "model_convnext_large.fb_in22k_ft_in1k": {
-            "img_size": 224,
-            "timm_name": "convnext_large.fb_in22k_ft_in1k",
-        },
+        "model_eva_large_patch14_336.in22k_ft_in22k_in1k": {
+            "img_size": 448,
+            "batch_size": 8,
+            "timm_name": "eva_large_patch14_336.in22k_ft_in22k_in1k",
+            "parameters": 300000000
+        }
+
     }
     return all_models
 
@@ -759,9 +760,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--epochs", type=int, default=5, help="Number of training epochs"
     )
-    parser.add_argument(
-        "--batch-size", type=int, default=16, help="Batch size for training"
-    )
+    # parser.add_argument(
+    #     "--batch-size", type=int, default=16, help="Batch size for training"
+    # )
     parser.add_argument(
         "--learning-rate", type=float, default=0.001, help="Learning rate for optimizer"
     )
@@ -919,8 +920,8 @@ if __name__ == "__main__":
     for i, name in enumerate(class_names):
         print(f"   {name:20s}: {class_counts[i]:5d} samples, weight: {class_weights[i].item():.4f}")
 
-    batch_size = args.batch_size
-    print(f"Batch size: {batch_size}")
+    
+    # print(f"Batch size: {batch_size}")
 
     if torch.cuda.is_available():
         gpu_alloc, gpu_reserved = get_gpu_memory()
@@ -934,6 +935,7 @@ if __name__ == "__main__":
     for model_name, model_config in models_dict.items():
         current_img_size = model_config["img_size"]
         timm_name = model_config["timm_name"]
+        batch_size = model_config["batch_size"]
 
         print(f"\n{'='*60}")
         print(f"🤖 MODEL CONFIG: {model_name}")
