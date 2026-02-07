@@ -1,4 +1,3 @@
-/data
 data.zip
 /comp
 .venv/
@@ -6,8 +5,10 @@ data.zip
 *.tar.gz
 *.gz
 .DS_Store
-*.jpg
-*.png
+data
+DSSAnimalClassification/data
+
+# Ignore image files everywhere except readImage and Archiecture folders
 *.jpeg
 *.gif
 *.bmp
@@ -18,3 +19,11 @@ data.zip
 *.eps
 *.pdf
 *.docx
+
+# But allow images in these specific folders
+!DSSAnimalClassification/readImage/**/*.jpg
+!DSSAnimalClassification/readImage/**/*.png
+!DSSAnimalClassification/readImage/**/*.jpeg
+!DSSAnimalClassification/Archiecture/**/*.jpg
+!DSSAnimalClassification/Archiecture/**/*.png
+!DSSAnimalClassification/Archiecture/**/*.jpeg
