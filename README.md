@@ -27,11 +27,10 @@ Example Images
 Over the past month, I have trained Resnet18, Swin Transformer, and Convnext-1 models. 
 
 * [Resnet18 Archiecture](DSSAnimalClassification/Archiecture/Resnet18.md)
-* [Resnet50 Archiecture](DSSAnimalClassification/Archiecture/Resnet50.md)
+<!-- * [Resnet50 Archiecture](DSSAnimalClassification/Archiecture/Resnet50.md) -->
 * [Swin archiecture](DSSAnimalClassification/Archiecture/Swin1.md)
-* [Convnext Archiecture](DS)
+* [Swin archiecture](DSSAnimalClassification/Archiecture/Swin3.md)
 * 
-
 
 
 
@@ -39,8 +38,10 @@ Over the past month, I have trained Resnet18, Swin Transformer, and Convnext-1 m
 | Model | Val Accuracy | Train Accuracy | Parameters |
 |-------|-------------|----------------|------------|
 | ResNet18 (baseline) | 86% | 90% | 11M |
-| ResNet50 | 82% | 92% | 25M |
 | **Swin-T (Stage 1)** | **89%** ✅ | 97% | 28M |
+| **Swin-B Test 1 (Stage 2)** | **90% | 93% | 88M |
+| **Swin-B Test 3 (Stage 3)** | **81% | 93% | 88M |
+
 
 
 
