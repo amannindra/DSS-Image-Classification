@@ -55,19 +55,12 @@ from dss_train_val import train_epoch, validate_epoch, TrainingLogger
 def model_compose():
     """Return model configurations (not instantiated models) to allow fresh creation each time"""
     all_models = {
-        "model_convnextv2_huge.fcmae_ft_in22k_in1k_384": {
-            "img_size": 384,
-            "batch_size": 16,
-            "timm_name": "convnextv2_huge.fcmae_ft_in22k_in1k_384",
-            "parameters": 700000000
-        },
         "model_eva_large_patch14_336.in22k_ft_in22k_in1k": {
-            "img_size": 448,
-            "batch_size": 16,
+            "img_size": 336,
+            "batch_size": 16,   
             "timm_name": "eva_large_patch14_336.in22k_ft_in22k_in1k",
-            "parameters": 300000000
+            "parameters": 300000000,
         }
-
     }
     return all_models
 
@@ -91,7 +84,8 @@ class MultiGPUModel:
         self.world_size = world_size
         for i in range(world_size):
             print(f"Device ID {i}: {torch.cuda.get_device_name(i)}")
-        self.model = DDP(model, device_ids=range(world_size))
+        # DDP takes ONE device per process, not all devices
+        self.model = DDP(model, device_ids=[rank])
 
 
 def create_model(timm_name, num_classes, device):
@@ -124,74 +118,6 @@ def transforms_compose(img_size):
                 ToTensorV2(),
             ]
         ),
-        "transform_2": A.Compose(
-            [
-                A.RandomResizedCrop(size=(img_size, img_size), scale=(0.8, 1.0)),
-                A.HorizontalFlip(p=0.5),
-                A.VerticalFlip(p=0.2),
-                A.RandomRotate90(p=0.2),
-                A.ShiftScaleRotate(
-                    shift_limit=0.1, scale_limit=0.2, rotate_limit=30, p=0.5
-                ),
-                A.OneOf(    
-                    [
-                        A.GaussNoise(std_range=(0.1, 0.2)),
-                        A.GaussianBlur(blur_limit=7),
-                        A.MotionBlur(blur_limit=7),
-                    ],
-                    p=0.3,
-                ),
-                A.OneOf(
-                    [
-                        A.OpticalDistortion(distort_limit=0.1),
-                        A.GridDistortion(distort_limit=0.1),
-                    ],
-                    p=0.2,
-                ),
-                A.CoarseDropout(
-                    num_holes_range=(1, 8),
-                    hole_height_range=(8, 32),
-                    hole_width_range=(8, 32),
-                    p=0.3,
-                ),
-                A.ColorJitter(
-                    brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1, p=0.5
-                ),
-                A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-                ToTensorV2(),
-            ]
-        ),
-        "transform_3": A.Compose(
-            [
-                A.RandomResizedCrop(size=(img_size, img_size), scale=(0.8, 1.0)),
-                A.HorizontalFlip(p=0.5),
-                A.VerticalFlip(p=0.2),
-                A.RandomRotate90(p=0.2),
-                A.OneOf(
-                    [
-                        A.OpticalDistortion(distort_limit=0.1),
-                        A.GridDistortion(distort_limit=0.1),
-                    ],
-                    p=0.2,
-                ),
-                A.OneOf([
-                    A.GaussianBlur(p=0.7),
-                    A.MedianBlur(p=0.7),
-                    A.MotionBlur(p=0.7),
-                ], p=0.5),
-                A.InvertImg(p=0.2),
-                A.Posterize(p=0.2),
-                A.CLAHE(p=0.2),
-                A.PlasmaShadow(
-                    shadow_intensity_range=(0.3, 0.5),
-                    plasma_size=img_size,
-                    roughness=3,
-                    p=0.2 
-                ),
-                A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-                ToTensorV2(),
-            ]
-        )
     }
     return all_transforms
 
@@ -232,10 +158,10 @@ def compute_test_model(
     test_output_dir,
 ):
     """Run inference on test set and save predictions"""
-    model_path = os.path.join(
-        models_dir, f"{model_name}_{key}_model_{from_epoch}.pth"
-    )
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    model_path = os.path.join(models_dir, f"{model_name}_{key}_model_{from_epoch}.pth")
+    # Load into the underlying module if DDP-wrapped, otherwise load directly
+    underlying = model.module if hasattr(model, "module") else model
+    underlying.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
     # Use Albumentations transform for test (matches training pipeline)
@@ -268,23 +194,29 @@ def compute_test_model(
     output_path = os.path.join(test_output_dir, f"submission_{from_epoch}.csv")
     submission_df.to_csv(output_path, index=False)
     print(f"✓ Test predictions saved to {output_path}")
-    
-    
 
 
+def main(rank, world_size):
+    print("main is called")
+    # ── 1. DDP setup FIRST (before any CUDA operations) ──
+    ddp_setup(rank, world_size)
 
+    # ── 2. Rank-specific device ──
+    device = torch.device(f"cuda:{rank}")
+    is_main = (rank == 0)  # Only rank 0 prints/saves
 
-if __name__ == "__main__":
-    print("Starting training...")
+    if is_main:
+        print("Starting training...")
+
     parser = argparse.ArgumentParser(
-        description='Train model for Animal Classification (Local & SageMaker)',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        description="Train model for Animal Classification (Local & SageMaker)",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "--epochs", type=int, default=5, help="Number of training epochs"
     )
     parser.add_argument(
-        "--learning-rate", type=float, default=0.001, help="Learning rate for optimizer"
+        "--learning-rate", type=float, default=2e-5, help="Learning rate for optimizer"
     )
     parser.add_argument(
         "--weight-decay",
@@ -296,20 +228,33 @@ if __name__ == "__main__":
         "--image-size", type=int, default=224, help="Input image size (224 or 384)"
     )
 
-    parser.add_argument("--use-cuda", type=lambda x: (str(x).lower() == 'true'), default=True,
-                        help="Use CUDA if available (true/false)")
+    parser.add_argument(
+        "--use-cuda",
+        type=lambda x: (str(x).lower() == "true"),
+        default=True,
+        help="Use CUDA if available (true/false)",
+    )
 
-    parser.add_argument("--data-dir", type=str, 
-                        default=os.environ.get("SM_CHANNEL_TRAINING", "./data"),
-                        help="Directory containing training data (train_labels.csv and train_features/)")
+    parser.add_argument(
+        "--data-dir",
+        type=str,
+        default=os.environ.get("SM_CHANNEL_TRAINING", "./data"),
+        help="Directory containing training data (train_labels.csv and train_features/)",
+    )
 
-    parser.add_argument("--model-dir", type=str, 
-                        default=os.environ.get("SM_MODEL_DIR", "./models"),
-                        help="Directory to save trained models")
+    parser.add_argument(
+        "--model-dir",
+        type=str,
+        default=os.environ.get("SM_MODEL_DIR", "./models"),
+        help="Directory to save trained models",
+    )
 
-    parser.add_argument("--output-dir", type=str,
-                        default=os.environ.get("SM_OUTPUT_DATA_DIR", "./output"),
-                        help="Directory to save metrics and logs")
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default=os.environ.get("SM_OUTPUT_DATA_DIR", "./output"),
+        help="Directory to save metrics and logs",
+    )
 
     # Model saving
     parser.add_argument(
@@ -319,54 +264,60 @@ if __name__ == "__main__":
         help="Filename for final saved model",
     )
 
-    sys_cpus = int(os.environ.get("SM_NUM_CPUS", os.cpu_count())) * 2/3
+    sys_cpus = int(os.environ.get("SM_NUM_CPUS", os.cpu_count()))
     sys_gpus = int(os.environ.get("SM_NUM_GPUS", 1))
+    # Divide CPU workers across GPU processes to avoid oversubscription
+    cpus_per_gpu = max(1, int(sys_cpus * 2 / 3 / world_size))
 
-    print(f"System CPUs: {sys_cpus}")
-    print(f"System GPUs: {sys_gpus}")
+    if is_main:
+        print(f"System CPUs: {sys_cpus}")
+        print(f"System GPUs: {sys_gpus}")
+        print(f"CPU workers per GPU process: {cpus_per_gpu}")
 
     parser.add_argument(
         "--num-cpu",
         type=int,
-        default=sys_cpus,  # Automatically defaults to the instance's max CPUs
-        help="Number of CPU workers for data loading",
+        default=cpus_per_gpu,
+        help="Number of CPU workers for data loading (per GPU process)",
     )
 
     args = parser.parse_args()
 
-    print(f"Arguments: {args}")
-    print(f"Initial RAM usage: {get_ram_usage():.2f} MB")
+    if is_main:
+        print(f"Arguments: {args}")
+        print(f"Initial RAM usage: {get_ram_usage():.2f} MB")
 
     # Detect running environment
     is_sagemaker = os.environ.get("SM_MODEL_DIR") is not None
 
-    print(f"SM_MODEL_DIR: {os.environ.get('SM_MODEL_DIR')}")
-    print(f"SM_OUTPUT_DATA_DIR: {os.environ.get('SM_OUTPUT_DATA_DIR')}")
+    if is_main:
+        print(f"SM_MODEL_DIR: {os.environ.get('SM_MODEL_DIR')}")
+        print(f"SM_OUTPUT_DATA_DIR: {os.environ.get('SM_OUTPUT_DATA_DIR')}")
 
     # Create directories if they don't exist (for local training)
-    if not is_sagemaker:
+    if not is_sagemaker and is_main:
         os.makedirs(args.model_dir, exist_ok=True)
 
-    print(f"\n📁 Directory Configuration:")
-    print(f"   Environment: {'🚀 SageMaker' if is_sagemaker else '💻 Local'}")
-    print(f"   Data directory: {args.data_dir}")
-    print(f"   Model directory: {args.model_dir}")
+    if is_main:
+        print(f"\n📁 Directory Configuration:")
+        print(f"   Environment: {'🚀 SageMaker' if is_sagemaker else '💻 Local'}")
+        print(f"   Data directory: {args.data_dir}")
+        print(f"   Model directory: {args.model_dir}")
 
-    device = torch.device(
-        "cuda" if args.use_cuda and torch.cuda.is_available() else "cpu"
-    )
-    print(f"Using device: {device}")
+    print(f"[Rank {rank}] Using device: {device}")
 
     # Validate CUDA availability if requested
-    if args.use_cuda and not torch.cuda.is_available():
-        print("WARNING: CUDA requested but not available. Falling back to CPU.")
-    elif args.use_cuda and torch.cuda.is_available():
-        print(f"CUDA device: {torch.cuda.get_device_name(0)}")
-        print(
-            f"CUDA memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.2f} GB"
-        )
+    if is_main:
+        if args.use_cuda and not torch.cuda.is_available():
+            print("WARNING: CUDA requested but not available. Falling back to CPU.")
+        elif args.use_cuda and torch.cuda.is_available():
+            for i in range(world_size):
+                print(f"   GPU {i}: {torch.cuda.get_device_name(i)}")
+                print(
+                    f"   GPU {i} memory: {torch.cuda.get_device_properties(i).total_memory / 1024**3:.2f} GB"
+                )
 
-    print(f"GPU memory: {get_gpu_memory_nvidia()}")
+        print(f"GPU memory: {get_gpu_memory_nvidia()}")
 
     class_names = [
         "antelope_duiker",
@@ -380,19 +331,14 @@ if __name__ == "__main__":
     ]
     num_classes = len(class_names)
 
-    print(f"Class names: {class_names}")
-    print(f"Number of classes: {num_classes}")
-    print(f"Initial RAM usage: {get_ram_usage():.2f} MB")
-
-    if torch.cuda.is_available():
-        gpu_alloc, gpu_reserved = get_gpu_memory()
-        print(f"GPU memory: {get_gpu_memory_nvidia()}")
-        print(
-            f"Initial GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB"
-        )
+    if is_main:
+        print(f"Class names: {class_names}")
+        print(f"Number of classes: {num_classes}")
+        print(f"Initial RAM usage: {get_ram_usage():.2f} MB")
 
     base_path = args.data_dir
-    print(f"Base path: {base_path}")
+    if is_main:
+        print(f"Base path: {base_path}")
 
     train_folder = os.path.join(base_path, "train_features")
     test_folder = os.path.join(base_path, "test_features")
@@ -403,26 +349,21 @@ if __name__ == "__main__":
         raise FileNotFoundError(f"Training labels CSV not found: {train_labels_csv}")
     if not os.path.exists(train_folder):
         raise FileNotFoundError(f"Training images folder not found: {train_folder}")
-    if not os.path.exists(test_features_csv):
+    if not os.path.exists(test_features_csv) and is_main:
         print(f"Warning: Test features CSV not found: {test_features_csv}")
 
     dataframe = pd.read_csv(train_labels_csv)
     dataframe_test = pd.read_csv(test_features_csv)
-    print(f"Dataframe train: {dataframe.head()}")
+    if is_main:
+        print(f"Dataframe train: {dataframe.head()}")
 
     if len(dataframe) == 0:
         raise ValueError("Training dataframe is empty!")
 
-    print(f"After loading CSV RAM usage: {get_ram_usage():.2f} MB")
-    if torch.cuda.is_available():
-        gpu_alloc, gpu_reserved = get_gpu_memory()
-        print(
-            f"After loading CSV GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB"
-        )
-
-    print(f"Loaded {len(dataframe)} training samples")
-    print(f"Dataframe Columns: {list(dataframe.columns)}")
-    print(f"Dataframe shape: {dataframe.shape}")
+    if is_main:
+        print(f"Loaded {len(dataframe)} training samples")
+        print(f"Dataframe Columns: {list(dataframe.columns)}")
+        print(f"Dataframe shape: {dataframe.shape}")
 
     train_df, val_df = train_test_split(
         dataframe,
@@ -438,61 +379,61 @@ if __name__ == "__main__":
 
     # Inverse frequency weighting: weight = total_samples / (num_classes * class_count)
     class_weights = total_samples / (num_classes * class_counts + 1e-6)
+    # Move to the rank-specific device
     class_weights = torch.tensor(class_weights, dtype=torch.float32).to(device)
-    print("class_weights: ", class_weights)    
-    print(f"\n📊 Class Distribution (Training Set):")
-    for i, name in enumerate(class_names):
-        print(f"   {name:20s}: {class_counts[i]:5d} samples, weight: {class_weights[i].item():.4f}")
+    if is_main:
+        print("class_weights: ", class_weights)
+        print(f"\n📊 Class Distribution (Training Set):")
+        for i, name in enumerate(class_names):
+            print(
+                f"   {name:20s}: {class_counts[i]:5d} samples, weight: {class_weights[i].item():.4f}"
+            )
 
-    # print(f"Batch size: {batch_size}")
-
-    if torch.cuda.is_available():
-        gpu_alloc, gpu_reserved = get_gpu_memory()
-        print(f"GPU memory: {get_gpu_memory_nvidia()}")
-        print(
-            f"After creating datasets GPU memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB"
-        )
-    
-    best_val_acc = {}
-    world_size = torch.cuda.device_count()
-    mp.spawn(main, args=(world_size,), nprocs=world_size, nprocs= world_size)
     models_dict = model_compose()
     for model_name, model_config in models_dict.items():
         current_img_size = model_config["img_size"]
         timm_name = model_config["timm_name"]
         batch_size = model_config["batch_size"]
 
-        print(f"\n{'='*60}")
-        print(f"🤖 MODEL CONFIG: {model_name}")
-        print(f"{'='*60}")
-        print(f"   Image size: {current_img_size}x{current_img_size}")
-        print(f"   TIMM model: {timm_name}")
+        if is_main:
+            print(f"\n{'='*60}")
+            print(f"🤖 MODEL CONFIG: {model_name}")
+            print(f"{'='*60}")
+            print(f"   Image size: {current_img_size}x{current_img_size}")
+            print(f"   TIMM model: {timm_name}")
 
         criterion = nn.CrossEntropyLoss(weight=class_weights)
 
         # Create transforms for this model's image size
         augmentation_transform = transforms_compose(current_img_size)
-        print(f"   Transforms: {list(augmentation_transform.keys())}")
+        if is_main:
+            print(f"   Transforms: {list(augmentation_transform.keys())}")
 
         num_transforms = len(augmentation_transform)
-        for transform_idx, (transform_key, transform_each) in enumerate(augmentation_transform.items()):
-            print(f"\n{'▓'*60}")
-            print(f"📦 TRANSFORM {transform_idx+1}/{num_transforms}: {transform_key}")
-            print(f"{'▓'*60}")
+        for transform_idx, (transform_key, transform_each) in enumerate(
+            augmentation_transform.items()
+        ):
+            if is_main:
+                print(f"\n{'▓'*60}")
+                print(f"📦 TRANSFORM {transform_idx+1}/{num_transforms}: {transform_key}")
+                print(f"{'▓'*60}")
 
-            print(f"\n🔄 Creating fresh model (pretrained weights)...")
-            mp.spawn(main, args=(world_size,), nprocs=world_size, join=True)
-            ddp_setup(rank, world_size)
+                print(f"\n🔄 Creating fresh model (pretrained weights)...")
+
+            # ── 3. Create model, move to rank GPU, wrap with DDP ──
             model = create_model(timm_name, num_classes, device)
+            model = model.to(device)
+            model = DDP(model, device_ids=[rank])
 
-            # world_size = torch.cuda.device_count()
-            # rank = torch.cuda.current_device()
-            # work = MultiGPUModel(model, device, rank, world_size)
             model.train()
-            print(f"   Parameters: {sum(p.numel() for p in model.parameters()):,}")
-            print(f"   Trainable params: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
+            if is_main:
+                print(f"   Parameters: {sum(p.numel() for p in model.parameters()):,}")
+                print(
+                    f"   Trainable params: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}"
+                )
 
-            print(f"\n🔧 Creating datasets...")
+            if is_main:
+                print(f"\n🔧 Creating datasets...")
             train_dataset = AnimalDatasetConvnext(
                 train_df,
                 transform=transform_each,
@@ -506,30 +447,43 @@ if __name__ == "__main__":
                 img_size=current_img_size,
             )
 
-            print(f"   Train dataset size: {len(train_dataset)}")
-            print(f"   Val dataset size: {len(val_dataset)}")
+            if is_main:
+                print(f"   Train dataset size: {len(train_dataset)}")
+                print(f"   Val dataset size: {len(val_dataset)}")
 
-            print(f"\n🔧 Creating dataloaders...")
+            # ── 4. Create samplers (store references for set_epoch) ──
+            train_sampler = DistributedSampler(
+                train_dataset, num_replicas=world_size, rank=rank, shuffle=True
+            )
+            val_sampler = DistributedSampler(
+                val_dataset, num_replicas=world_size, rank=rank, shuffle=False
+            )
+
+            if is_main:
+                print(f"\n🔧 Creating dataloaders...")
             train_loader = DataLoader(
                 train_dataset,
                 batch_size=batch_size,
-                shuffle=False,
+                shuffle=False,  # Sampler handles shuffling
                 num_workers=args.num_cpu,
-                sampler=DistributedSampler(train_dataset, num_replicas=world_size, rank=rank),
+                sampler=train_sampler,
+                pin_memory=True,
             )
             val_loader = DataLoader(
                 val_dataset,
                 batch_size=batch_size,
                 shuffle=False,
                 num_workers=args.num_cpu,
-                sampler=DistributedSampler(val_dataset, num_replicas=world_size, rank=rank),
+                sampler=val_sampler,
+                pin_memory=True,
             )
 
-            print(f"   Train batches: {len(train_loader)}")
-            print(f"   Val batches: {len(val_loader)}")
-            print(f"   Batch size: {batch_size}")
-            print(f"   Num workers: {args.num_cpu}")
-            print(f"   RAM usage: {get_ram_usage():.2f} MB")
+            if is_main:
+                print(f"   Train batches: {len(train_loader)}")
+                print(f"   Val batches: {len(val_loader)}")
+                print(f"   Batch size: {batch_size}")
+                print(f"   Num workers: {args.num_cpu}")
+                print(f"   RAM usage: {get_ram_usage():.2f} MB")
 
             # Directory structure: model_dir/model_name/transform_key/{models,data,test}
             base_dir = os.path.join(args.model_dir, model_name, transform_key)
@@ -537,15 +491,16 @@ if __name__ == "__main__":
             data_dir = os.path.join(base_dir, "data")
             test_dir = os.path.join(base_dir, "test")
 
-            os.makedirs(models_dir, exist_ok=True)
-            os.makedirs(data_dir, exist_ok=True)
-            os.makedirs(test_dir, exist_ok=True)
+            if is_main:
+                os.makedirs(models_dir, exist_ok=True)
+                os.makedirs(data_dir, exist_ok=True)
+                os.makedirs(test_dir, exist_ok=True)
 
-            print(f"\n📁 Output Structure:")
-            print(f"   Base: {base_dir}")
-            print(f"   Models: {models_dir}")
-            print(f"   Data (JSON/CSV): {data_dir}")
-            print(f"   Test: {test_dir}")
+                print(f"\n📁 Output Structure:")
+                print(f"   Base: {base_dir}")
+                print(f"   Models: {models_dir}")
+                print(f"   Data (JSON/CSV): {data_dir}")
+                print(f"   Test: {test_dir}")
 
             train_logger = TrainingLogger(
                 data_output_dir=data_dir,
@@ -563,29 +518,45 @@ if __name__ == "__main__":
             from_epoch = 0
             best_val = 0.0
 
-            # Reset optimizer and scheduler for each transform
-            optimizer = optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=args.weight_decay)
+            optimizer = optim.AdamW(
+                model.parameters(),
+                lr=args.learning_rate,
+                weight_decay=args.weight_decay,
+            )
             scaler = GradScaler()
             scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=args.epochs)
 
-            print(f"\n🎯 Starting training loop: {args.epochs} epochs")
-            print(f"   Initial LR: {args.learning_rate}")
-            print(f"   Scheduler: CosineAnnealingWarmRestarts (T_0={args.epochs})")
+            if is_main:
+                print(f"\n🎯 Starting training loop: {args.epochs} epochs")
+                print(f"   Initial LR: {args.learning_rate}")
+                print(f"   Scheduler: CosineAnnealingWarmRestarts (T_0={args.epochs})")
 
             for epoch in range(args.epochs):
-                print(f"\n{'═'*60}")
-                print(f"🔄 EPOCH {epoch+1}/{args.epochs} | Model: {model_name[:30]}... | Transform: {transform_key}")
-                print(f"{'═'*60}")
+                # ── 5. CRITICAL: set_epoch for proper shuffling each epoch ──
+                train_sampler.set_epoch(epoch)
+                val_sampler.set_epoch(epoch)
 
-                current_lr = optimizer.param_groups[0]['lr']
-                print(f"   Current Learning Rate: {current_lr:.8f}")
+                if is_main:
+                    print(f"\n{'═'*60}")
+                    print(
+                        f"🔄 EPOCH {epoch+1}/{args.epochs} | Model: {model_name[:30]}... | Transform: {transform_key}"
+                    )
+                    print(f"{'═'*60}")
+
+                current_lr = optimizer.param_groups[0]["lr"]
+                if is_main:
+                    print(f"   Current Learning Rate: {current_lr:.8f}")
 
                 if torch.cuda.is_available():
                     torch.cuda.empty_cache()
-                    gpu_alloc, gpu_reserved = get_gpu_memory()
-                    print(f"GPU memory: {get_gpu_memory_nvidia()}")
-                    print(f"   GPU Memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB")
-                print(f"   RAM Usage: {get_ram_usage():.2f} MB")
+                    if is_main:
+                        gpu_alloc, gpu_reserved = get_gpu_memory()
+                        print(f"GPU memory: {get_gpu_memory_nvidia()}")
+                        print(
+                            f"   GPU Memory - Allocated: {gpu_alloc:.2f} MB, Reserved: {gpu_reserved:.2f} MB"
+                        )
+                if is_main:
+                    print(f"   RAM Usage: {get_ram_usage():.2f} MB")
 
                 train_acc, train_report = train_epoch(
                     model,
@@ -603,13 +574,20 @@ if __name__ == "__main__":
                 train_report["epoch"] = epoch
                 train_logger.log_report(train_report)
 
-                if torch.cuda.is_available():
+                if torch.cuda.is_available() and is_main:
                     gpu_alloc, gpu_reserved = get_gpu_memory()
-                    print(f"\n   🖥️  Post-train GPU: Allocated={gpu_alloc:.2f} MB, Reserved={gpu_reserved:.2f} MB")
+                    print(
+                        f"\n   🖥️  Post-train GPU: Allocated={gpu_alloc:.2f} MB, Reserved={gpu_reserved:.2f} MB"
+                    )
 
                 val_acc, val_report = validate_epoch(
-                    model, val_loader, criterion, device, class_names=class_names,
-                    epoch=epoch, total_epochs=args.epochs
+                    model,
+                    val_loader,
+                    criterion,
+                    device,
+                    class_names=class_names,
+                    epoch=epoch,
+                    total_epochs=args.epochs,
                 )
                 val_report["epoch"] = epoch
 
@@ -619,74 +597,100 @@ if __name__ == "__main__":
                 val_report["lr_before"] = lr_before
                 val_report["lr_after"] = lr_after
 
-                print(f"\n   📈 LR Update: {lr_before:.8f} → {lr_after:.8f}")
+                if is_main:
+                    print(f"\n   📈 LR Update: {lr_before:.8f} → {lr_after:.8f}")
                 val_logger.log_report(val_report)
 
-                if torch.cuda.is_available():   
+                if torch.cuda.is_available() and is_main:
                     gpu_alloc, gpu_reserved = get_gpu_memory()
                     print(f"GPU memory: {get_gpu_memory_nvidia()}")
-                    print(f"   🖥️  Post-val GPU: Allocated={gpu_alloc:.2f} MB, Reserved={gpu_reserved:.2f} MB")
+                    print(
+                        f"   🖥️  Post-val GPU: Allocated={gpu_alloc:.2f} MB, Reserved={gpu_reserved:.2f} MB"
+                    )
 
                 # Epoch summary
-                print(f"\n   {'─'*50}")
-                print(f"   📋 EPOCH {epoch+1} SUMMARY:")
-                print(f"      Train Acc: {train_acc:.4f} | Val Acc: {val_acc:.4f}")
-                print(f"      Train Loss: {train_report['loss']:.4f} | Val Loss: {val_report['loss']:.4f}")
-                print(f"      Best Val Acc so far: {best_val:.4f}")
-                print(f"   {'─'*50}")
+                if is_main:
+                    print(f"\n   {'─'*50}")
+                    print(f"   📋 EPOCH {epoch+1} SUMMARY:")
+                    print(f"      Train Acc: {train_acc:.4f} | Val Acc: {val_acc:.4f}")
+                    print(
+                        f"      Train Loss: {train_report['loss']:.4f} | Val Loss: {val_report['loss']:.4f}"
+                    )
+                    print(f"      Best Val Acc so far: {best_val:.4f}")
+                    print(f"   {'─'*50}")
 
-                if val_acc > best_val and rank == 0:
+                if val_acc > best_val:
                     from_epoch = epoch
                     best_val = val_acc
-                    print(f"\n   🏆 NEW BEST! Val Accuracy: {val_acc:.4f} (Epoch {epoch+1})")
-                    print(f"   💾 Saving best model...")
-
-                    save_model(model, models_dir, model_name, transform_key, epoch)
+                    if is_main:
+                        print(
+                            f"\n   🏆 NEW BEST! Val Accuracy: {val_acc:.4f} (Epoch {epoch+1})"
+                        )
+                        print(f"   💾 Saving best model...")
+                        save_model(model, models_dir, model_name, transform_key, epoch)
 
             # Training complete for this transform
-            print(f"\n{'▓'*60}")
-            print(f"✅ TRAINING COMPLETE for {transform_key}")
-            print(f"{'▓'*60}")
-            print(f"   Best validation accuracy: {best_val:.4f} (Epoch {from_epoch+1})")
+            if is_main:
+                print(f"\n{'▓'*60}")
+                print(f"✅ TRAINING COMPLETE for {transform_key}")
+                print(f"{'▓'*60}")
+                print(f"   Best validation accuracy: {best_val:.4f} (Epoch {from_epoch+1})")
 
-            # Save final metrics and model
-            print(f"\n💾 Saving final metrics and model...")
-            final_epoch_marker = args.epochs + 100
-            train_logger.save_data_metrics(final_epoch_marker)
-            val_logger.save_data_metrics(final_epoch_marker)
-            save_model(model, models_dir, model_name, transform_key, final_epoch_marker)
+                # Save final metrics and model (rank 0 only)
+                print(f"\n💾 Saving final metrics and model...")
+                final_epoch_marker = args.epochs + 100
+                train_logger.save_data_metrics(final_epoch_marker)
+                val_logger.save_data_metrics(final_epoch_marker)
+                save_model(model, models_dir, model_name, transform_key, final_epoch_marker)
 
-            # Run test inference
-            print(f"\n🧪 Running test inference...")
-            compute_test_model(
-                model,
-                models_dir,
-                model_name,
-                transform_key,
-                from_epoch,
-                device,
-                class_names,
-                batch_size,
-                args.num_cpu,
-                current_img_size,
-                test_folder,
-                dataframe_test,
-                test_dir,
-            )
-            print(f"✅ Test inference complete!")
+                # Run test inference (rank 0 only)
+                print(f"\n🧪 Running test inference...")
+                compute_test_model(
+                    model,
+                    models_dir,
+                    model_name,
+                    transform_key,
+                    from_epoch,
+                    device,
+                    class_names,
+                    batch_size,
+                    args.num_cpu,
+                    current_img_size,
+                    test_folder,
+                    dataframe_test,
+                    test_dir,
+                )
+                print(f"✅ Test inference complete!")
+
+            # Wait for rank 0 to finish saving before cleanup
+            torch.distributed.barrier()
 
             # Clean up model to free GPU memory before next transform
-            print(f"\n🧹 Cleaning up model and freeing memory...")
+            if is_main:
+                print(f"\n🧹 Cleaning up model and freeing memory...")
             del model
             del optimizer
             del scheduler
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
-            gc.collect()
-            print(f"   RAM usage after cleanup: {get_ram_usage():.2f} MB")
-            if torch.cuda.is_available():
-                gpu_alloc, gpu_reserved = get_gpu_memory()
-                print(f"GPU memory: {get_gpu_memory_nvidia()}")
-                print(f"   GPU after cleanup: Allocated={gpu_alloc:.2f} MB, Reserved={gpu_reserved:.2f} MB")
 
-    print("\n✓ Training complete!")
+            gc.collect()
+            if is_main:
+                print(f"   RAM usage after cleanup: {get_ram_usage():.2f} MB")
+                if torch.cuda.is_available():
+                    gpu_alloc, gpu_reserved = get_gpu_memory()
+                    print(f"GPU memory: {get_gpu_memory_nvidia()}")
+                    print(
+                        f"   GPU after cleanup: Allocated={gpu_alloc:.2f} MB, Reserved={gpu_reserved:.2f} MB"
+                    )
+
+    destroy_process_group()
+    if is_main:
+        print("\n✓ Training complete!")
+
+
+if __name__ == "__main__":
+    print("STARTING")
+    world_size = torch.cuda.device_count()
+    mp.spawn(main, args=(world_size,), nprocs=world_size)
+    

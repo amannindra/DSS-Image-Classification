@@ -26,3 +26,16 @@ __pycache__/
 .gitignore
 README.md
 
+DSSAnimalClassification/convnext-1
+DSSAnimalClassification/data
+DSSAnimalClassification/readImage
+DSSAnimalClassification/resnet18
+DSSAnimalClassification/submissions
+DSSAnimalClassification/swinb
+DSSAnimalClassification/swinb-final3
+DSSAnimalClassification/swinb-test1
+DSSAnimalClassification/swinb-test2
+DSSAnimalClassification/swinb-test3
+DSSAnimalClassification/swinb-test4
+DSSAnimalClassification/waste
+DSSAnimalClassification/Archiecture

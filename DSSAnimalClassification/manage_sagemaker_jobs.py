@@ -40,7 +40,7 @@ class SageMakerJobManager:
     - Model Explainability jobs
     """
     
-    def __init__(self, region='us-west-1'):
+    def __init__(self, region='us-east-1'):
         self.region = region
         self.sm_client = boto3.client('sagemaker', region_name=region)
     
@@ -702,8 +702,8 @@ def main():
     parser.add_argument(
         '--region',
         type=str,
-        default='us-west-1',
-        help='AWS region (default: us-west-1)'
+        default='us-east-1',
+        help='AWS region (default: us-east-1)'
     )
     parser.add_argument(
         '--action',

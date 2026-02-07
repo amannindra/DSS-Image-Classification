@@ -1,27 +1,23 @@
-# python3 -c 'print("START")'
-# mkdir -p /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/models
-# mkdir -p /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/output
-# mkdir -p /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/temp
-# python3 -c 'print("Making folders finished")'
-# aws s3 cp s3://sagemaker-us-east-1-253490779227/convnext-large-2026-02-03-18-50-08-651/output/model.tar.gz /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/temp
-# python3 -c 'print("S3 download finished")'
-# tar -tvf /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/temp/model.tar.gz
-# python3 -c 'print("Tar listing finished")'
+#!/bin/bash
+set -e
 
+BASE="/Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/all-7"
+TAR="$BASE/model.tar.gz"
+S3_PATH="s3://sagemaker-us-east-1-253490779227/all-7-2026-02-07-08-00-06-510/output/model.tar.gz"
 
-# tar -xzf /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/temp/model.tar.gz -C /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/temp
-# python3 -c 'print("Extraction finished")'
+python3 -c 'print("START")'
 
-# find /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/temp \
-#   -name "*.pth" -exec mv {} /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/models/ \;
+mkdir -p "$BASE"
+python3 -c 'print("Making folders finished")'
 
-# find /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/temp \
-#   -name "*.json" -exec mv {} /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/output/ \;
+aws s3 cp "$S3_PATH" "$TAR"
+python3 -c 'print("S3 download finished")'
 
+tar -tvf "$TAR"
+python3 -c 'print("Tar listing finished")'
 
-# python3 -c 'print("Moving files finished")'
+tar -xzf "$TAR" -C "$BASE"
+python3 -c 'print("Extraction finished")'
 
-# rm -rf /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/convnext-1/temp
-
-# # tar -xzf /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/swinb-test2/model.tar.gz -C /Users/amannindra/Projects/DSS-Image-Classification/DSSAnimalClassification/swinb-test2/output
-# python3 -c 'print("All finished")'
+rm -f "$TAR"
+python3 -c 'print("All finished")'
