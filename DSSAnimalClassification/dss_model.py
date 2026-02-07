@@ -598,7 +598,7 @@ def main(rank, world_size):
                 val_report["lr_after"] = lr_after
 
                 if is_main:
-                    print(f"\n   📈 LR Update: {lr_before:.8f} → {lr_after:.8f}")
+                    print(f"\n   LR Update: {lr_before:.8f} → {lr_after:.8f}")
                 val_logger.log_report(val_report)
 
                 if torch.cuda.is_available() and is_main:
@@ -611,7 +611,7 @@ def main(rank, world_size):
                 # Epoch summary
                 if is_main:
                     print(f"\n   {'─'*50}")
-                    print(f"   📋 EPOCH {epoch+1} SUMMARY:")
+                    print(f"   EPOCH {epoch+1} SUMMARY:")
                     print(f"      Train Acc: {train_acc:.4f} | Val Acc: {val_acc:.4f}")
                     print(
                         f"      Train Loss: {train_report['loss']:.4f} | Val Loss: {val_report['loss']:.4f}"
@@ -624,27 +624,27 @@ def main(rank, world_size):
                     best_val = val_acc
                     if is_main:
                         print(
-                            f"\n   🏆 NEW BEST! Val Accuracy: {val_acc:.4f} (Epoch {epoch+1})"
+                            f"\n    NEW BEST! Val Accuracy: {val_acc:.4f} (Epoch {epoch+1})"
                         )
-                        print(f"   💾 Saving best model...")
+                        print(f"    Saving best model...")
                         save_model(model, models_dir, model_name, transform_key, epoch)
 
             # Training complete for this transform
             if is_main:
                 print(f"\n{'▓'*60}")
-                print(f"✅ TRAINING COMPLETE for {transform_key}")
+                print(f"TRAINING COMPLETE for {transform_key}")
                 print(f"{'▓'*60}")
                 print(f"   Best validation accuracy: {best_val:.4f} (Epoch {from_epoch+1})")
 
                 # Save final metrics and model (rank 0 only)
-                print(f"\n💾 Saving final metrics and model...")
+                print(f"\nSaving final metrics and model...")
                 final_epoch_marker = args.epochs + 100
                 train_logger.save_data_metrics(final_epoch_marker)
                 val_logger.save_data_metrics(final_epoch_marker)
                 save_model(model, models_dir, model_name, transform_key, final_epoch_marker)
 
                 # Run test inference (rank 0 only)
-                print(f"\n🧪 Running test inference...")
+                print(f"\nRunning test inference...")
                 compute_test_model(
                     model,
                     models_dir,

@@ -34,11 +34,11 @@ Over the past month, I have trained multiple state-of-the-art models for wildlif
 
 
 **Model Performance Comparison**:
-| Model | Val Accuracy | Train Accuracy | Generalization Gap | Parameters | Resolution |
-|-------|-------------|----------------|-------------------|------------|------------|
-| ResNet18 (baseline) | 88.50% | 98.37% | +9.87% | 11M | 224 |
-| Swin-T (Stage 1) | 91.61% | 99.08% | +7.47% | 28M | 224 |
-| **EVA-Large** ✅ | **91.27%** | **90.63%** | **-0.64%** | **300M** | **336** |
+| Model | Val Accuracy | Train Accuracy | Generalization Gap | Parameters | Resolution | Log Loss
+|-------|-------------|----------------|-------------------|------------|------------|------|
+| ResNet18 (baseline) | 88.50% | 98.37% | +9.87% | 11M | 224 | NA |
+| Swin-T (Stage 1) | 91.61% | 99.08% | +7.47% | 28M | 224 | 2.1786 |
+| **EVA-Large** ✅ | **91.27%** | **90.63%** | **-0.64%** | **300M** | **336** | 0.6695 |
 
 **Why EVA is the Best Model**:
 - **Superior Generalization**: Only model with negative generalization gap (validation accuracy exceeds training accuracy)
@@ -48,7 +48,9 @@ Over the past month, I have trained multiple state-of-the-art models for wildlif
 - **Advanced Architecture**: Vision Transformer with enhanced attention mechanisms
 - **Production Ready**: Demonstrates consistent performance suitable for real-world deployment
 
+## Achieved Top 4 out 500+ teams with EVA-Large Archiecture:
 
+![Alt text description](image.png)
 
 
 
